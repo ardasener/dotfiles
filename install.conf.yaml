@@ -1,0 +1,17 @@
+- defaults:
+    link:
+      relink: true
+
+- clean: ['~', '~/.vim', '~/.config']
+
+- link:
+    ~/.vim/coc-settings.json: coc-settings.json
+    ~/.vimrc: vimrc
+    ~/.bashrc: bashrc
+    ~/.config/redshift.conf: redshift.conf
+
+- create:
+    - ~/.vim
+
+- shell:
+  - [git submodule update --init --recursive, Installing submodules]
