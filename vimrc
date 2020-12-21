@@ -83,11 +83,8 @@ Plug 'honza/vim-snippets'
 " C++ better highlights
 Plug 'octol/vim-cpp-enhanced-highlight'
 
-" Better highlights and indentation for many languages
-Plug 'sheerun/vim-polyglot'
-
 " Tree file manager
-Plug 'preservim/nerdtree'
+Plug 'lambdalisue/fern.vim'
 
 " Git integration (mostly for the statusline)
 Plug 'tpope/vim-fugitive'
@@ -183,8 +180,6 @@ let g:cpp_posix_standard = 1
 set noshowmode
 let g:echodoc_enable_at_startup = 1
 
-" NerdTree statusline
-let g:NERDTreeStatusline = -1
 
 "Sets the comment style for the languages listed to line comments
 "So '//' instead of '/* */'. Commentary plugin will then use '//'.
@@ -198,10 +193,6 @@ autocmd FileType c,cpp,java,go,rust setlocal commentstring=//\ %s
 set foldmethod=syntax
 autocmd FileType vim setlocal foldmethod=marker
 set nofoldenable
-
-" Quit vim if only nerdtree is open
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree")
-			\ && b:NERDTree.isTabTree()) | q | endif
 
 " Neoterm (toggle-terminal) settings
 let g:neoterm_default_mod = 'belowright'
@@ -400,7 +391,7 @@ tnoremap <C-Right> <C-W>l
 tnoremap <C-Left> <C-W>h
 
 " File manager with CTRL + n
-map <C-n> :NERDTreeToggle<CR>
+nmap <C-n> :Fern . -drawer -toggle<CR>
 
 " Fix indentation
 nmap <C-i> :FixAll<CR>
