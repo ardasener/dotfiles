@@ -7,6 +7,7 @@
 "		- If required pure vimscript plugins are prefered.
 "		- LSP is used as it reduces the number of additional plugins required
 "		(Check LSP section to see what to install)
+"
 "}}}
 
 "{{{1 PLUGINS
@@ -35,7 +36,7 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-repeat'
 
 " Replace with register using gr<move>
-Plug 'vim-scripts/ReplaceWithRegister'
+" Plug 'vim-scripts/ReplaceWithRegister'
 
 " Sort objects alphabetically with gs<move>
 Plug 'christoomey/vim-sort-motion'
@@ -88,9 +89,6 @@ Plug 'lambdalisue/fern.vim'
 
 " Git integration (mostly for the statusline)
 Plug 'tpope/vim-fugitive'
-
-" Switch between source/header with :A and :AV (vertical split) and others
-Plug 'vim-scripts/a.vim'
 
 " Shows indentation levels
 Plug 'yggdroot/indentline'
@@ -253,7 +251,7 @@ set statusline+=\ %y
 set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
 set statusline+=\[%{&fileformat}\]
 set statusline+=\ %l/%L
-set statusline+=\ %{coc#status()}
+" set statusline+=\ %{coc#status()}
 "}}}
 
 "{{{ AUTO COMPLETE AND LSP
@@ -342,7 +340,29 @@ hi clear Error
 hi clear pythonSpaceError
 "}}}
 
-"{{{ COMMANDS
+"{{{ COMMANDS AND FUNCTIONS
+
+" Switches between source/header for C/C++/Cuda
+function! SwitchSourceHeader()
+  if (expand ("%:e") == "cpp")
+    silent! find %:t:r.h
+    silent! find %:t:r.hpp
+  elseif (expand ("%:e") == "c")
+    silent! find %:t:r.h
+  elseif (expand ("%:e") == "hpp")
+    silent! find %:t:r.cpp
+    silent! find %:t:r.cu	
+  elseif (expand ("%:e") == "h")
+    silent! find %:t:r.cpp
+    silent! find %:t:r.c	
+    silent! find %:t:r.cu	
+  elseif (expand ("%:e") == "cu")	
+    silent! find %:t:r.h
+    silent! find %:t:r.hpp
+  endif
+endfunction
+
+
 " Edit/Source Config
 command! Config e ~/.vimrc
 command! SourceConfig source ~/.vimrc
@@ -366,9 +386,12 @@ command! Spell setlocal spell!
 " Change pwd to current file's parent directory
 command! Cdc lcd %:p:h
 
+command! -nargs=0 Format :call CocAction('format')
 "}}}
 
 "{{{ KEYBINDINGS
+
+let mapleader = " "
 
 "Switch windows with CTRL + H,J,K,L or CTRL + arrow keys
 nnoremap <C-J> <C-W>j
@@ -394,7 +417,7 @@ tnoremap <C-Left> <C-W>h
 nmap <C-n> :Fern . -drawer -toggle<CR>
 
 " Fix indentation
-nmap <C-i> :FixAll<CR>
+nmap <leader><C-i> :Format<CR>
 
 " Fuzzy search current pwd with CTRL + p
 " Fuzzy search history with CTRL + h
@@ -408,10 +431,18 @@ nnoremap <C-d> :Devdocs <CR>
 " Select all text with CTRL + a
 map <C-a> <esc>ggVG<CR>
 
-" Show definition with gd, go back with gb
-nnoremap gd <C-]>
-nnoremap gb <C-T>
+" COC Bindings
+nmap gd <Plug>(coc-definition)
+nmap gy <Plug>(coc-type-definition)
+nmap gi <Plug>(coc-implementation)
+nmap gr <Plug>(coc-references)
+nmap <leader>rn <Plug>(coc-rename)
+nmap <leader>ca <Plug>(coc-codeaction)
+nmap <leader>qf  <Plug>(coc-fix-current)
 
+
+" Switch between header/source
+nnoremap <silent> <leader>aa :call SwitchSourceHeader()<cr>
 
 " Toggle terminal with CTRL + k
 nnoremap <silent> <C-k> :Ttoggle<CR>
@@ -429,4 +460,6 @@ imap <C-j> <Plug>snipMateNextOrTrigger
 map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
 			\ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
 			\ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
+
+
 "}}}
