@@ -95,6 +95,20 @@ Plug 'yggdroot/indentline'
 
 " Toggles terminal (does more stuff but I don't use them)
 Plug 'kassio/neoterm'
+
+" Basically a tree browser for edits
+Plug 'mbbill/undotree'
+
+" Peek the contents of the registers
+" Press " in normal, Ctrl+R in insert mode
+" "ay will yank the text in to register a (vim's behaviour, not plugin's)
+" "ap will paste the text in register a (vim's behaviour, not plugin's) 
+Plug 'junegunn/vim-peekaboo'
+
+" Puts a cooldown on hjkl and arrow keys
+" Forcing you to use more advanced commands/bindings
+Plug 'takac/vim-hardtime'
+
 "2}}}
 
 call plug#end()
@@ -102,6 +116,10 @@ call plug#end()
 "1}}}
 
 "{{{ SETTINGS
+
+" Bring it on...
+let g:hardtime_default_on = 1
+let g:hardtime_timeout = 500
 
 " Get rid of vi compatibility
 set nocompatible
@@ -181,7 +199,7 @@ let g:echodoc_enable_at_startup = 1
 
 "Sets the comment style for the languages listed to line comments
 "So '//' instead of '/* */'. Commentary plugin will then use '//'.
-autocmd FileType c,cpp,java,go,rust setlocal commentstring=//\ %s
+autocmd FileType c,cpp,java,go,rust,javascript setlocal commentstring=//\ %s
 
 " Folding
 " Syntax based folding not enabled at start
@@ -198,6 +216,9 @@ let g:neoterm_size = 10
 let g:neoterm_fixedsize = '1'
 let g:neoterm_autoscroll = '1'
 let g:neoterm_autoinsert=1
+
+
+let g:undotree_WindowLayout = 3					        
 
 "}}}
 
@@ -453,6 +474,8 @@ tnoremap <silent> <C-k> <C-w>k:Ttoggle<CR>
 " Useful for scrolling
 tnoremap <Esc><Esc> <C-\><C-n>
 
+" Toggle UndoTree with CTRL + U
+nnoremap <C-u> :UndotreeToggle<CR>
 
 " Expand snippets with CTRL + j
 imap <C-j> <Plug>snipMateNextOrTrigger
