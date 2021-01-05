@@ -118,7 +118,7 @@ call plug#end()
 "{{{ SETTINGS
 
 " Bring it on...
-let g:hardtime_default_on = 1
+let g:hardtime_default_on = 0
 let g:hardtime_timeout = 500
 
 " Get rid of vi compatibility
@@ -152,6 +152,16 @@ set signcolumn=yes
 let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlPMixed'
 let g:ctrlp_mruf_max = 250
+
+" CtrlP tends to be fast enough without caching
+" Especially with the limits set
+let g:ctrlp_use_caching = 0
+
+" Ignore some folders and files for CtrlP indexing
+let g:ctrlp_custom_ignore = {
+  \ 'dir':  '\.git$\|\.yardoc\|node_modules\|log\|tmp$\|target',
+  \ 'file': '\.so$\|\.dat$|\.DS_Store$'
+  \ }
 
 "When searching, fully lowercase strings will ignorecase
 set ignorecase
@@ -302,7 +312,7 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 if has('termguicolors')
 	set termguicolors
 endif
-colorscheme base16-tomorrow-night
+colorscheme base16-monokai
 set background=dark
 
 " Make line numbers have transparent background

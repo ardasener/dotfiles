@@ -2,12 +2,24 @@
 # ~/.bashrc
 #
 
+set -o vi
+
 
 # PROMPT
-RESET="\[$(tput sgr0)\]"
-GREEN="\[$(tput setaf 2)\]"
-PS1="${GREEN}->${RESET} "
+export PROMPT_COMMAND=set_prompt
 
+RESET="$(tput sgr0)"
+GREEN="$(tput setaf 2)"
+RED="$(tput setaf 9)"
+BOLD="$(tput bold)"
+
+set_prompt() {
+	if [ $? == 0 ]; then
+		PS1='${BOLD}${GREEN}\t \W -> ${RESET}'
+	else	
+		PS1='${BOLD}${RED}\t \W -> ${RESET}'
+	fi
+}
 
 
 # ALIASES
