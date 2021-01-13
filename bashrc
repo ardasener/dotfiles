@@ -11,13 +11,12 @@ export PROMPT_COMMAND=set_prompt
 RESET="$(tput sgr0)"
 GREEN="$(tput setaf 2)"
 RED="$(tput setaf 9)"
-BOLD="$(tput bold)"
 
 set_prompt() {
 	if [ $? == 0 ]; then
-		PS1='${BOLD}${GREEN}\t \W -> ${RESET}'
+		PS1="\[\e[0;32m\]\t \W -> \[\e[m\]"
 	else	
-		PS1='${BOLD}${RED}\t \W -> ${RESET}'
+		PS1="\[\e[0;31m\]\t \W -> \[\e[m\]"
 	fi
 }
 
