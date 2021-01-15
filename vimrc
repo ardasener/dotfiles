@@ -67,7 +67,7 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'Shougo/echodoc.vim'
 
 " Colorscheme
-Plug 'chriskempson/base16-vim'
+Plug 'joshdick/onedark.vim'
 
 " Automatically switch to project root
 Plug 'airblade/vim-rooter'
@@ -75,14 +75,8 @@ Plug 'airblade/vim-rooter'
 " Rust plugin provides support for syntastic
 Plug 'rust-lang/rust.vim'
 
-" Snippets
-Plug 'MarcWeber/vim-addon-mw-utils'
-Plug 'tomtom/tlib_vim'
-Plug 'garbas/vim-snipmate'
-Plug 'honza/vim-snippets'
-
-" C++ better highlights
-Plug 'octol/vim-cpp-enhanced-highlight'
+" Syntax highlighting for many languages
+Plug 'sheerun/vim-polyglot'
 
 " Tree file manager
 Plug 'lambdalisue/fern.vim'
@@ -141,9 +135,8 @@ syntax on
 " run :set wrap! to toggle it on/off
 set nowrap
 
-" Relative Line numbers
+" Line numbers
 set number
-set relativenumber
 
 " Always on gutter
 set signcolumn=yes
@@ -155,6 +148,7 @@ let g:ctrlp_mruf_max = 250
 
 " CtrlP tends to be fast enough without caching
 " Especially with the limits set
+" With this, I never have to refresh
 let g:ctrlp_use_caching = 0
 
 " Ignore some folders and files for CtrlP indexing
@@ -212,11 +206,12 @@ let g:echodoc_enable_at_startup = 1
 autocmd FileType c,cpp,java,go,rust,javascript setlocal commentstring=//\ %s
 
 " Folding
-" Syntax based folding not enabled at start
+" Indent based folding enabled at start
+" Syntax based seems to cause slow downs
 " For vim uses markers {{{ and }}}
-" For markdown uses the built-in filetype
+" For markdown uses the built-in filetype (set elsewhere)
 " Use zm to close all, za to toggle current
-set foldmethod=syntax
+set foldmethod=indent
 autocmd FileType vim setlocal foldmethod=marker
 set nofoldenable
 
@@ -227,7 +222,7 @@ let g:neoterm_fixedsize = '1'
 let g:neoterm_autoscroll = '1'
 let g:neoterm_autoinsert=1
 
-
+" Open undotree on the right
 let g:undotree_WindowLayout = 3					        
 
 "}}}
@@ -312,7 +307,7 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 if has('termguicolors')
 	set termguicolors
 endif
-colorscheme base16-monokai
+colorscheme onedark
 set background=dark
 
 " Make line numbers have transparent background
@@ -448,7 +443,7 @@ tnoremap <C-Left> <C-W>h
 nmap <C-n> :Fern . -drawer -toggle<CR>
 
 " Fix indentation
-nmap <leader><C-i> :Format<CR>
+nmap <leader>f :Format<CR>
 
 " Fuzzy search current pwd with CTRL + p
 " Fuzzy search history with CTRL + h
