@@ -103,6 +103,9 @@ Plug 'junegunn/vim-peekaboo'
 " Forcing you to use more advanced commands/bindings
 Plug 'takac/vim-hardtime'
 
+" Lightline (statusline)
+ Plug 'itchyny/lightline.vim'
+
 "2}}}
 
 call plug#end()
@@ -141,9 +144,24 @@ set number
 " Always on gutter
 set signcolumn=yes
 
+" Always on statusline
+set laststatus=2
+
+" Statusline Config
+let g:lightline = {
+			\ 'colorscheme': 'onedark', 
+			\ 'active': {
+			\   'left': [ [ 'mode', 'paste' ],
+			\             [ 'readonly', 'filename', 'modified', ], ['cocstatus'] ],
+			\   'right': [['lineinfo'], ['percent'], ['fileformat', 'fileencoding', 'filetype']]
+			\ },
+			\ 'component_function': {
+			\   'cocstatus': 'coc#status'
+			\ },
+			\ }
+
 " CtrlP Settings
 let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlPMixed'
 let g:ctrlp_mruf_max = 250
 
 " CtrlP tends to be fast enough without caching
@@ -245,41 +263,6 @@ endfunction
 au FileType markdown call MDSetup()
 "}}}
 
-"{{{ STATUSLINE
-let g:currentmode={
-			\ 'n'  : 'Normal',
-			\ 'no' : 'Normal·Operator Pending',
-			\ 'v'  : 'Visual',
-			\ 'V'  : 'V·Line',
-			\ '' : 'V·Block',
-			\ 's'  : 'Select',
-			\ 'S'  : 'S·Line',
-			\ '^S' : 'S·Block',
-			\ 'i'  : 'Insert',
-			\ 'R'  : 'Replace',
-			\ 'Rv' : 'V·Replace',
-			\ 'c'  : 'Command',
-			\ 'cv' : 'Vim Ex',
-			\ 'ce' : 'Ex',
-			\ 'r'  : 'Prompt',
-			\ 'rm' : 'More',
-			\ 'r?' : 'Confirm',
-			\ '!'  : 'Shell',
-			\ 't'  : 'Terminal'
-			\}
-
-set laststatus=2
-set statusline=\ %{toupper(g:currentmode[mode()])}
-set statusline+=\ %f
-set statusline+=\ %{FugitiveStatusline()}
-set statusline+=%=
-set statusline+=\ %y
-set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
-set statusline+=\[%{&fileformat}\]
-set statusline+=\ %l/%L
-" set statusline+=\ %{coc#status()}
-"}}}
-
 "{{{ AUTO COMPLETE AND LSP
 
 " A lot of the configuration is in ~/.vim/coc-settings.json
@@ -319,20 +302,6 @@ hi CursorLineNr ctermfg=white guifg=#c5c8c6 cterm=bold gui=bold
 " (will only use | characters)
 hi clear VertSplit
 hi VertSplit ctermfg=grey guifg=#4e4e4e guibg=bg ctermbg=bg
-
-" Clear statusline (same colors as line numbers)
-hi clear StatusLine
-hi clear StatusLineNC
-hi clear StatusLineTerm
-hi clear StatusLineTermNC
-hi link StatusLine LineNr
-hi link StatusLineNC LineNr
-hi link StatusLineTerm LineNr
-hi link StatusLineTermNC LineNr
-set fillchars=stl:-,stlnc:x,vert:\|,fold:-,diff:-
-
-" Statusline error highlight
-hi StatuslineError guifg=#cc6666 ctermfg=red
 
 " Highlight currentline in insert mode
 autocmd InsertEnter * set cul
@@ -442,7 +411,7 @@ tnoremap <C-Left> <C-W>h
 " File manager with CTRL + n
 nmap <C-n> :Fern . -drawer -toggle<CR>
 
-" Fix indentation
+" Fix indentation etc.
 nmap <leader>f :Format<CR>
 
 " Fuzzy search current pwd with CTRL + p
