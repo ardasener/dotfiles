@@ -5,10 +5,11 @@
 - clean: ['~', '~/.vim', '~/.config']
 
 - link:
-    ~/.vim/coc-settings.json: coc-settings.json
     ~/.vimrc: vimrc
     ~/.bashrc: bashrc
     ~/.config/redshift.conf: redshift.conf
+    ~/.config/alacritty/alacritty.yml: alacritty.yml
+    ~/.tmux.conf: tmux.conf
 
 - create:
     - ~/.vim
