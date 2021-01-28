@@ -14,9 +14,9 @@ RED="$(tput setaf 9)"
 
 set_prompt() {
 	if [ $? == 0 ]; then
-		PS1="\[\e[0;32m\]\t \W -> \[\e[m\]"
+		PS1="\[\e[0;32m\]\W -> \[\e[m\]"
 	else	
-		PS1="\[\e[0;31m\]\t \W -> \[\e[m\]"
+		PS1="\[\e[0;31m\]\W -> \[\e[m\]"
 	fi
 }
 

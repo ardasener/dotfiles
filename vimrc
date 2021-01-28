@@ -21,8 +21,10 @@ endif
 
 call plug#begin('~/.vim/plugged')
 
-
 "{{{2 CUSTOM OPERATORS
+
+" Allows creating custom operators
+Plug 'jeanCarloMachado/vim-toop'
 
 " Change surround with cs<new><old>
 " delete it with ds<old>
@@ -36,7 +38,7 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-repeat'
 
 " Replace with register using gr<move>
-" Plug 'vim-scripts/ReplaceWithRegister'
+Plug 'vim-scripts/ReplaceWithRegister'
 
 " Sort objects alphabetically with gs<move>
 Plug 'christoomey/vim-sort-motion'
@@ -60,14 +62,8 @@ Plug 'kana/vim-textobj-indent'
 " Fuzzy finder
 Plug 'ctrlpvim/ctrlp.vim'
 
-" LSP
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
-" Echos function signatures to the echo area (command line below)
-Plug 'Shougo/echodoc.vim'
-
 " Colorscheme
-Plug 'joshdick/onedark.vim'
+Plug 'srcery-colors/srcery-vim'
 
 " Automatically switch to project root
 Plug 'airblade/vim-rooter'
@@ -79,16 +75,11 @@ Plug 'rust-lang/rust.vim'
 Plug 'sheerun/vim-polyglot'
 
 " Tree file manager
+" Similar to nerdtree, but a bit easier to use
 Plug 'lambdalisue/fern.vim'
 
 " Git integration (mostly for the statusline)
 Plug 'tpope/vim-fugitive'
-
-" Shows indentation levels
-Plug 'yggdroot/indentline'
-
-" Toggles terminal (does more stuff but I don't use them)
-Plug 'kassio/neoterm'
 
 " Basically a tree browser for edits
 Plug 'mbbill/undotree'
@@ -99,12 +90,23 @@ Plug 'mbbill/undotree'
 " "ap will paste the text in register a (vim's behaviour, not plugin's) 
 Plug 'junegunn/vim-peekaboo'
 
-" Puts a cooldown on hjkl and arrow keys
-" Forcing you to use more advanced commands/bindings
-Plug 'takac/vim-hardtime'
+" Statusline
+Plug 'vim-airline/vim-airline'
 
-" Lightline (statusline)
- Plug 'itchyny/lightline.vim'
+" Code formatting using external formatters
+Plug 'sbdchd/neoformat'
+
+" Automatic tags file generation
+Plug 'ludovicchabant/vim-gutentags'
+
+" Syntax checking (linting)
+Plug 'vim-syntastic/syntastic'
+
+" Snippets 
+if(has("python3"))
+	Plug 'SirVer/ultisnips'
+	Plug 'honza/vim-snippets'
+endif
 
 "2}}}
 
@@ -113,10 +115,6 @@ call plug#end()
 "1}}}
 
 "{{{ SETTINGS
-
-" Bring it on...
-let g:hardtime_default_on = 0
-let g:hardtime_timeout = 500
 
 " Get rid of vi compatibility
 set nocompatible
@@ -127,9 +125,6 @@ set novisualbell
 
 " Split below by default (help, terminal etc.)
 set splitbelow
-
-" Size of the built-in terminal window
-set termwinsize=10x0
 
 " Enable syntax highlighting
 syntax on
@@ -146,19 +141,6 @@ set signcolumn=yes
 
 " Always on statusline
 set laststatus=2
-
-" Statusline Config
-let g:lightline = {
-			\ 'colorscheme': 'onedark', 
-			\ 'active': {
-			\   'left': [ [ 'mode', 'paste' ],
-			\             [ 'readonly', 'filename', 'modified', ], ['cocstatus'] ],
-			\   'right': [['lineinfo'], ['percent'], ['fileformat', 'fileencoding', 'filetype']]
-			\ },
-			\ 'component_function': {
-			\   'cocstatus': 'coc#status'
-			\ },
-			\ }
 
 " CtrlP Settings
 let g:ctrlp_map = '<c-p>'
@@ -189,6 +171,7 @@ set softtabstop=2
 set cindent
 
 " Font for GUI
+" Just in case I decide to use it for some reason
 set guifont=Dejavu\ Sans\ Mono\ 13
 
 " Shell like completion for commands
@@ -204,6 +187,7 @@ set spellcapcheck=
 let g:rooter_patterns=[".git", "Makefile", "makefile", "package.json",
 			\	"pom.xml", "cargo.toml", "setup.py"]
 let g:ctrlp_root_markers = g:rooter_patterns
+let g:gutentags_project_root = g:rooter_patterns
 
 " Stops rooter from echoing the directory
 let g:rooter_silent_chdir = 1
@@ -213,11 +197,6 @@ let g:cpp_class_scope_highlight = 1
 let g:cpp_member_variable_highlight = 1
 let g:cpp_class_decl_highlight = 1
 let g:cpp_posix_standard = 1
-
-"Setup for echodoc
-set noshowmode
-let g:echodoc_enable_at_startup = 1
-
 
 "Sets the comment style for the languages listed to line comments
 "So '//' instead of '/* */'. Commentary plugin will then use '//'.
@@ -233,15 +212,30 @@ set foldmethod=indent
 autocmd FileType vim setlocal foldmethod=marker
 set nofoldenable
 
-" Neoterm (toggle-terminal) settings
-let g:neoterm_default_mod = 'belowright'
-let g:neoterm_size = 10
-let g:neoterm_fixedsize = '1'
-let g:neoterm_autoscroll = '1'
-let g:neoterm_autoinsert=1
-
 " Open undotree on the right
-let g:undotree_WindowLayout = 3					        
+let g:undotree_WindowLayout = 3
+
+" Completion Options
+set completeopt=menuone,noselect
+
+" Makes gutentags use the .cache directory
+" Otherwise the project folders get messy, and gitignore etc.
+let g:gutentags_cache_dir = expand("~/.cache/tags")
+
+" Who cares about whitespace, I will run a formatter anyway
+let g:airline#extensions#whitespace#enabled = 0
+
+" Enable nice looking tabline
+let g:airline#extensions#tabline#enabled = 1
+
+" Syntastic is not async, so it lags a lot
+" This way syntastic only runs when manually called
+" either with :SyntasticCheck (<C-e>) or :Errors
+let g:syntastic_mode_map = {"mode":"passive"}
+
+
+" Expand snippet with <C-j>
+let g:UltiSnipsExpandTrigger="<C-j>"
 
 "}}}
 
@@ -263,40 +257,27 @@ endfunction
 au FileType markdown call MDSetup()
 "}}}
 
-"{{{ AUTO COMPLETE AND LSP
+"{{{ HIGHLIGHTSS
 
-" A lot of the configuration is in ~/.vim/coc-settings.json
-" Or simply run :CocConfig
-
-" use <tab> for trigger completion and navigate to the next complete item
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~ '\s'
-endfunction
-
-inoremap <silent><expr> <Tab>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<Tab>" :
-      \ coc#refresh()
-
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-
-
-"}}}
-
-"{{{ HIGHLIGHTS
+" Improves highlight performance
+set synmaxcol=100  
 
 " Color Scheme
 if has('termguicolors')
 	set termguicolors
 endif
-colorscheme onedark
 set background=dark
+colorscheme srcery
+
+" Ghetto fix for alacritty not having colors
+if &term == "alacritty"        
+  let &term = "xterm-256color"
+endif
 
 " Make line numbers have transparent background
 hi clear LineNr
 hi LineNr ctermfg=grey guifg=#4e4e4e ctermbg=bg guibg=bg
-hi CursorLineNr ctermfg=white guifg=#c5c8c6 cterm=bold gui=bold
+hi CursorLineNr ctermfg=white guifg=#D0BFA1 cterm=bold gui=bold
 
 " Remove the vertical split line color
 " (will only use | characters)
@@ -304,22 +285,12 @@ hi clear VertSplit
 hi VertSplit ctermfg=grey guifg=#4e4e4e guibg=bg ctermbg=bg
 
 " Highlight currentline in insert mode
-autocmd InsertEnter * set cul
-autocmd InsertLeave * set nocul
-
-hi clear CocErrorSign
-hi clear CocWarningSign
-hi clear CocInfoSign
-hi clear CocHintSign 
-hi CocErrorSign guifg=#cc6666 ctermfg=red
-hi CocWarningSign guifg=#de935f ctermfg=208
-hi CocInfoSign guifg=#f0c674 ctermfg=yellow
-hi CocHintSign guifg=#f0c674 ctermfg=yellow
-
+" autocmd InsertEnter * set cul
+" autocmd InsertLeave * set nocul
 
 " Highlight the extra characters on lines with 80+ chars
-"highlight OverLength ctermbg=red ctermfg=white guifg=#ffffff guibg=#cc6666
-"match OverLength /\%80v.\+/
+" highlight OverLength ctermbg=red ctermfg=white guifg=#ffffff guibg=#cc6666
+" match OverLength /\%80v.\+/
 
 " Spell highlight
 hi clear SpellBad
@@ -335,9 +306,10 @@ hi clear Error
 hi clear pythonSpaceError
 "}}}
 
-"{{{ COMMANDS AND FUNCTIONS
+"{{{ FUNCTIONS
 
 " Switches between source/header for C/C++/Cuda
+" An alternative to a.vim
 function! SwitchSourceHeader()
   if (expand ("%:e") == "cpp")
     silent! find %:t:r.h
@@ -357,6 +329,44 @@ function! SwitchSourceHeader()
   endif
 endfunction
 
+" With the relevant keybinding will trigger completion
+" or insert a tab (or space) character depending on the context
+function! TabOrComplete() abort
+  " If completor is already open the `tab` cycles through suggested completions.
+  if pumvisible()
+    return "\<C-N>"
+  " If completor is not open and we are in the middle of typing a word then
+  " `tab` opens completor menu.
+  elseif col('.')>1 && strpart( getline('.'), col('.')-2, 3 ) =~ '^[[:keyword:][:ident:]]'
+    return "\<C-R>=completor#do('complete')\<CR>"
+  else
+    " If we aren't typing a word and we press `tab` simply do the normal `tab`
+    " action.
+    return "\<Tab>"
+  endif
+endfunction
+
+" Silent allows running commands without the press Enter prompt
+" The built-in silent command messes up the screen in terminal, so redraw
+command! -nargs=1 Silent
+\ | execute ':silent '.<q-args>
+\ | execute ':redraw!'
+
+function! Google(str)
+	let url = 'https://google.com/search?q=' . &filetype . '+'. a:str
+	Silent exec "!firefox " . "'" . url . "'"
+endfunction
+
+function! Devdocs(str)
+	let url = 'https://devdocs.io/\\\#q=' . a:str
+	Silent exec "!firefox " . "'" . url . "'"
+endfunction
+
+"}}}
+
+
+"{{{ COMMANDSS
+
 
 " Edit/Source Config
 command! Config e ~/.vimrc
@@ -367,25 +377,18 @@ command! -bar FixIndent :normal gg=G''<CR>
 command! FixTrailing %s/\s\+$//e
 command! FixAll FixIndent|FixTrailing
 
-" Search google automatically using filetype and word under cursor
-command! Google exec "!xdg-open 'https://google.com/search?q="
-			\ . &filetype . "+<cword>'"
-
-" Search devdocs automatically using the word under cursor
-command! Devdocs exec "!xdg-open 'https://devdocs.io/\\\#q="
-			\ . "<cword>'"
-
 " Toggle spell checking
 command! Spell setlocal spell!
 
 " Change pwd to current file's parent directory
 command! Cdc lcd %:p:h
 
-command! -nargs=0 Format :call CocAction('format')
 "}}}
 
 "{{{ KEYBINDINGS
 
+
+" The leader is the space key
 let mapleader = " "
 
 "Switch windows with CTRL + H,J,K,L or CTRL + arrow keys
@@ -408,52 +411,55 @@ tnoremap <C-Up> <C-W>k
 tnoremap <C-Right> <C-W>l
 tnoremap <C-Left> <C-W>h
 
+" Run syntax checker with CTRL + e
+nmap <C-e> :SyntasticCheck<CR>
+
 " File manager with CTRL + n
 nmap <C-n> :Fern . -drawer -toggle<CR>
 
-" Fix indentation etc.
-nmap <leader>f :Format<CR>
+" Format the file with external program with Leader + ff (format file)
+nmap <leader>ff :Neoformat<CR>
 
-" Fuzzy search current pwd with CTRL + p
+" Fuzzy search current pwd with CTRL + p (defined by plugin)
 " Fuzzy search history with CTRL + h
 nnoremap <C-h> :CtrlPMRUFiles <CR>
 
-" Search google for the word under cursor with CTRL + g
-" Search devdocs.io for the word under cursor with CTRL + d
-nnoremap <C-g> :Google <CR>
-nnoremap <C-d> :Devdocs <CR>
+" Search google for the word under cursor with Leader + sg (search google)
+" Search devdocs.io for the word under cursor with Leader + sd (search devdocs)
+call toop#mapFunction('Google', '<leader>sg')
+call toop#mapFunction('Devdocs', '<leader>sd')
+
+" Tag navigation
+" gd (go to definition)
+" gb (go back)
+nnoremap gd <C-]>
+nnoremap gb <C-o>
 
 " Select all text with CTRL + a
 map <C-a> <esc>ggVG<CR>
 
-" COC Bindings
-nmap gd <Plug>(coc-definition)
-nmap gy <Plug>(coc-type-definition)
-nmap gi <Plug>(coc-implementation)
-nmap gr <Plug>(coc-references)
-nmap <leader>rn <Plug>(coc-rename)
-nmap <leader>ca <Plug>(coc-codeaction)
-nmap <leader>qf  <Plug>(coc-fix-current)
-
-
-" Switch between header/source
+" Switch between header/source with Leader + aa (alternative to a.vim?)
 nnoremap <silent> <leader>aa :call SwitchSourceHeader()<cr>
-
-" Toggle terminal with CTRL + k
-nnoremap <silent> <C-k> :Ttoggle<CR>
-tnoremap <silent> <C-k> <C-w>k:Ttoggle<CR>
-
-" Switch to normal mode in terminal with double tab ESC
-" Return to terminal mode with i (like insert mode)
-" Useful for scrolling
-tnoremap <Esc><Esc> <C-\><C-n>
 
 " Toggle UndoTree with CTRL + U
 nnoremap <C-u> :UndotreeToggle<CR>
 
-" Expand snippets with CTRL + j
-imap <C-j> <Plug>snipMateNextOrTrigger
+" Tag completion and file completion rebinds
+" This ain't emacs
+" Summary :
+" <C-t> is tag completion
+" <C-f> is path completion
+" <C-l> is line completion
+" <C-n> forward completion (mixed sources)
+" <C-p> backwards completion (mixed sources)
+" <C-j> expand snippet (not completion, but related)
+inoremap <C-t> <C-x><C-]>
+inoremap <C-f> <C-x><C-f>
+inoremap <C-l> <C-x><C-l>
 
+
+" Determines the highlight under the cursor
+" Useful for finding those annoying ones
 map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
 			\ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
 			\ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
