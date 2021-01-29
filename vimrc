@@ -93,17 +93,16 @@ Plug 'junegunn/vim-peekaboo'
 " Statusline
 Plug 'vim-airline/vim-airline'
 
-" Code formatting using external formatters
-Plug 'sbdchd/neoformat'
+" Language Server Protocol
+" OmniComplete + Linting + Formatting + Rename/GoToDef. etc.
+Plug 'prabirshrestha/vim-lsp'
+Plug 'mattn/vim-lsp-settings'
 
-" Automatic tags file generation
-Plug 'ludovicchabant/vim-gutentags'
+" Completion with the tab key
+Plug 'ervandew/supertab'
 
-" Syntax checking (linting)
-Plug 'vim-syntastic/syntastic'
-
-" Snippets 
-if(has("python3"))
+" Snippets
+if has("python3")
 	Plug 'SirVer/ultisnips'
 	Plug 'honza/vim-snippets'
 endif
@@ -218,26 +217,46 @@ let g:undotree_WindowLayout = 3
 " Completion Options
 set completeopt=menuone,noselect
 
-" Makes gutentags use the .cache directory
-" Otherwise the project folders get messy, and gitignore etc.
-let g:gutentags_cache_dir = expand("~/.cache/tags")
-
 " Who cares about whitespace, I will run a formatter anyway
 let g:airline#extensions#whitespace#enabled = 0
 
 " Enable nice looking tabline
 let g:airline#extensions#tabline#enabled = 1
 
-" Syntastic is not async, so it lags a lot
-" This way syntastic only runs when manually called
-" either with :SyntasticCheck (<C-e>) or :Errors
-let g:syntastic_mode_map = {"mode":"passive"}
-
-
 " Expand snippet with <C-j>
 let g:UltiSnipsExpandTrigger="<C-j>"
 
+" Uses local completion by default (<C-p>)
+" Uses path completion when you have /,~ etc.
+" Uses omni completion (LSP) when you have .,::,-> etc.
+let g:SuperTabDefaultCompletionType="context"
+
 "}}}
+
+
+"{{{ LSP
+function! s:on_lsp_buffer_enabled() abort
+	setlocal omnifunc=lsp#complete
+	nmap <buffer> K <plug>(lsp-hover)
+	nmap <buffer> gd <plug>(lsp-definition)
+	nmap <buffer> gs <plug>(lsp-document-symbol-search)
+	nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
+	nmap <buffer> gr <plug>(lsp-references)
+	nmap <buffer> gi <plug>(lsp-implementation)
+	nmap <buffer> gt <plug>(lsp-type-definition)
+	nmap <buffer> <leader>rn <plug>(lsp-rename)
+	nmap <buffer> <leader>ff <plug>(lsp-document-format)
+endfunction
+
+autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+
+let g:lsp_diagnostics_signs_error = {'text': 'e'}
+let g:lsp_diagnostics_signs_warning = {'text': 'w'}
+let g:lsp_diagnostics_signs_hint = {'text': 'h'}
+let g:lsp_diagnostics_signs_information = {'text': 'i'}
+
+"}}}
+
 
 "{{{ MARKDOWN
 
@@ -429,12 +448,6 @@ nnoremap <C-h> :CtrlPMRUFiles <CR>
 call toop#mapFunction('Google', '<leader>sg')
 call toop#mapFunction('Devdocs', '<leader>sd')
 
-" Tag navigation
-" gd (go to definition)
-" gb (go back)
-nnoremap gd <C-]>
-nnoremap gb <C-o>
-
 " Select all text with CTRL + a
 map <C-a> <esc>ggVG<CR>
 
@@ -444,19 +457,16 @@ nnoremap <silent> <leader>aa :call SwitchSourceHeader()<cr>
 " Toggle UndoTree with CTRL + U
 nnoremap <C-u> :UndotreeToggle<CR>
 
-" Tag completion and file completion rebinds
-" This ain't emacs
-" Summary :
-" <C-t> is tag completion
-" <C-f> is path completion
-" <C-l> is line completion
-" <C-n> forward completion (mixed sources)
-" <C-p> backwards completion (mixed sources)
-" <C-j> expand snippet (not completion, but related)
-inoremap <C-t> <C-x><C-]>
+" File/Path complete with CTRL + f
+" Line complete with CTRL + l
+" Omni complete with CTRL + o
+" Otherwise just use tab
 inoremap <C-f> <C-x><C-f>
 inoremap <C-l> <C-x><C-l>
+inoremap <C-o> <C-x><C-o>
 
+" Go back
+nnoremap gb <C-o>
 
 " Determines the highlight under the cursor
 " Useful for finding those annoying ones
