@@ -10,16 +10,18 @@
 "
 "}}}
 
+
 "{{{1 PLUGINS
 
 " Installs vim plug if it is not already
-if empty(glob('~/.vim/autoload/plug.vim'))
-	silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+if empty(glob('~/.local/share/nvim/site/autoload'))
+	silent !curl -fLo  ~/.local/share/nvim/site/autoload --create-dirs
 				\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 	autocmd VimEnter * PlugInstall --sync | source ~/.vimrc
 endif
 
-call plug#begin('~/.vim/plugged')
+call plug#begin('~/.local/share/nvim/site/plugged')
+
 
 "{{{2 CUSTOM OPERATORS
 
@@ -63,7 +65,7 @@ Plug 'kana/vim-textobj-indent'
 Plug 'ctrlpvim/ctrlp.vim'
 
 " Colorscheme
-Plug 'srcery-colors/srcery-vim'
+Plug 'sainnhe/sonokai'
 
 " Automatically switch to project root
 Plug 'airblade/vim-rooter'
@@ -90,20 +92,27 @@ Plug 'mbbill/undotree'
 " "ap will paste the text in register a (vim's behaviour, not plugin's) 
 Plug 'junegunn/vim-peekaboo'
 
-" Completion with the tab key
-Plug 'ervandew/supertab'
-
 " Lsp Configurations
 Plug 'neovim/nvim-lspconfig'
 
+" Completion
+Plug 'nvim-lua/completion-nvim'
+Plug 'albertoCaroM/completion-tmux'
+Plug 'steelsojka/completion-buffers'
+
+" Echos function signatures
+Plug 'Shougo/echodoc.vim'
+
 " Statusline
-Plug 'itchyny/lightline.vim'
+Plug 'vim-airline/vim-airline'
+
+" Creates a floating terminal in the middle of the screen
+" No idea how this is useful but it looks cool
+Plug 'voldikss/vim-floaterm'
 
 " Snippets
-if has("python3")
-	Plug 'SirVer/ultisnips'
-	Plug 'honza/vim-snippets'
-endif
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
 
 "2}}}
 
@@ -157,9 +166,6 @@ let g:ctrlp_custom_ignore = {
 "When searching, fully lowercase strings will ignorecase
 set ignorecase
 set smartcase
-
-" Clipboard (Copy/Yank-Paste) Sync
-set clipboard=unnamedplus
 
 " Tab Size -> 2 Spaces
 set shiftwidth=2
@@ -220,20 +226,95 @@ set completeopt=menuone,noselect
 let g:airline#extensions#whitespace#enabled = 0
 
 " Enable nice looking tabline
-" let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#enabled = 1
 
 " Expand snippet with <C-j>
 let g:UltiSnipsExpandTrigger="<C-j>"
 
-" Uses local completion by default (<C-p>)
-" Uses path completion when you have /,~ etc.
-" Uses omni completion (LSP) when you have .,::,-> etc.
-let g:SuperTabDefaultCompletionType="context"
-
 " Limit pumheight (completion menu)
 set pumheight=10
 
+" Toggle a terminal with C-t
+let g:floaterm_keymap_toggle = '<C-t>'
+
+" Echo function signatures using virtual text
+let g:echodoc#enable_at_startup = 1
+let g:echodoc#type = 'virtual'
+
+" Enable completion on all buffers
+autocmd BufEnter * lua require'completion'.on_attach()
+
+" Set completion to use UltiSnips
+let g:completion_enable_snippet = 'UltiSnips'
+
+let g:completion_chain_complete_list = {
+    \ 'vim': [
+		\    {'mode': 'cmd'},
+    \    {'mode': '<c-p>'},
+    \    {'mode': '<c-n>'}
+    \],
+    \ 'default': [
+    \    {'complete_items': ['lsp', 'snippet']},
+		\    {'complete_items': ['buffer', 'tmux']},
+    \    {'mode': '<c-p>'},
+    \    {'mode': '<c-n>'}
+    \]
+\}
+
+" Automatically switch sources
+let g:completion_auto_change_source = 1
+
+" Disable autopopup
+let g:completion_enable_auto_popup = 0
+
 "}}}
+
+
+"{{{LSP
+lua << EOF
+local nvim_lsp = require('lspconfig')
+
+local on_attach = function(client, bufnr)
+  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+  local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+
+	buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
+
+	local opts = { noremap=true, silent=true }
+	buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+	buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+	buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+	buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+	buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+	buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+	buf_set_keymap('n', 'gR', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+	buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+
+  -- Set some keybinds conditional on server capabilities
+  if client.resolved_capabilities.document_formatting then
+    buf_set_keymap("n", "<space>ff", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+  elseif client.resolved_capabilities.document_range_formatting then
+    buf_set_keymap("n", "<space>ff", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+  end
+
+end
+
+
+
+-- Add any server specific configuration here
+nvim_lsp.rust_analyzer.setup{
+	on_attach = on_attach
+}
+nvim_lsp.clangd.setup{
+	on_attach = on_attach
+}
+nvim_lsp.pyls.setup{
+	on_attach = on_attach
+}
+
+EOF
+"}}}
+
 
 
 
@@ -260,17 +341,19 @@ au FileType markdown call MDSetup()
 " Improves highlight performance
 set synmaxcol=100  
 
-" Color Scheme
 if has('termguicolors')
+  let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
+  let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
 	set termguicolors
 endif
-set background=dark
-colorscheme srcery
 
-" Ghetto fix for alacritty not having colors
-if &term == "alacritty"        
-  let &term = "xterm-256color"
-endif
+" Color Scheme
+set background=dark
+let g:sonokai_style = 'andromeda'
+let g:sonokai_enable_italic = 1
+let g:sonokai_disable_italic_comment = 1
+colorscheme sonokai
+
 
 " Make line numbers have transparent background
 hi clear LineNr
@@ -282,14 +365,6 @@ hi CursorLineNr ctermfg=white guifg=#D0BFA1 cterm=bold gui=bold
 hi clear VertSplit
 hi VertSplit ctermfg=grey guifg=#4e4e4e guibg=bg ctermbg=bg
 
-" Highlight currentline in insert mode
-" autocmd InsertEnter * set cul
-" autocmd InsertLeave * set nocul
-
-" Highlight the extra characters on lines with 80+ chars
-" highlight OverLength ctermbg=red ctermfg=white guifg=#ffffff guibg=#cc6666
-" match OverLength /\%80v.\+/
-
 " Spell highlight
 hi clear SpellBad
 hi clear SpellLocal
@@ -299,9 +374,15 @@ hi link SpellBad SpellLocal
 " Clear Gutter (bar on the left with syntax error signs)
 highlight clear SignColumn
 
+" Nicer looking border on the floating terminal
+hi clear FloatermBorder
+hi FloatermBorder guifg=orange ctermfg=red
+
 " Annoying python space error highlight
 hi clear Error
 hi clear pythonSpaceError
+
+
 "}}}
 
 "{{{ FUNCTIONS
@@ -327,21 +408,9 @@ function! SwitchSourceHeader()
   endif
 endfunction
 
-" With the relevant keybinding will trigger completion
-" or insert a tab (or space) character depending on the context
-function! TabOrComplete() abort
-  " If completor is already open the `tab` cycles through suggested completions.
-  if pumvisible()
-    return "\<C-N>"
-  " If completor is not open and we are in the middle of typing a word then
-  " `tab` opens completor menu.
-  elseif col('.')>1 && strpart( getline('.'), col('.')-2, 3 ) =~ '^[[:keyword:][:ident:]]'
-    return "\<C-R>=completor#do('complete')\<CR>"
-  else
-    " If we aren't typing a word and we press `tab` simply do the normal `tab`
-    " action.
-    return "\<Tab>"
-  endif
+
+function! MultipleTabs() abort
+	return tabpagenr('$') > 1 
 endfunction
 
 " Silent allows running commands without the press Enter prompt
@@ -367,8 +436,8 @@ endfunction
 
 
 " Edit/Source Config
-command! Config e ~/.vimrc
-command! SourceConfig source ~/.vimrc
+command! Config e ~/.config/nvim/init.vim
+command! SourceConfig source ~/.config/nvim/init.vim
 
 " Auto-formating using vim-itself
 command! -bar FixIndent :normal gg=G''<CR>
@@ -443,6 +512,17 @@ nnoremap <C-u> :UndotreeToggle<CR>
 inoremap <C-f> <C-x><C-f>
 inoremap <C-l> <C-x><C-l>
 inoremap <C-o> <C-x><C-o>
+
+" Completion with tab key in insert mode
+imap <tab> <Plug>(completion_smart_tab)
+imap <s-tab> <Plug>(completion_smart_s_tab)
+
+" Switch tabs/buffers with tab key in normal mode
+nnoremap <expr> <tab> MultipleTabs() ? ':tabnext<CR>' : ':bnext<CR>'  
+nnoremap <expr> <s-tab> MultipleTabs() ? ':tabprevious<CR>' : ':bprevious<CR>'  
+
+" Clear search highlight
+nnoremap <C-g> :noh<CR>
 
 " Go back
 nnoremap gb <C-o>

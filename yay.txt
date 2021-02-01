@@ -1,0 +1,8 @@
+alacritty
+tmux
+neovim-nightly-bin
+python-pynvim
+xclip
+redshift
+htop
+mc

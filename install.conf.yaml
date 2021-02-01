@@ -2,17 +2,12 @@
     link:
       relink: true
 
-- clean: ['~', '~/.vim', '~/.config']
-
 - link:
-    ~/.vimrc: vimrc
     ~/.bashrc: bashrc
     ~/.config/redshift.conf: redshift.conf
     ~/.config/alacritty/alacritty.yml: alacritty.yml
     ~/.tmux.conf: tmux.conf
-
-- create:
-    - ~/.vim
+    ~/.config/nvim/init.vim: init.vim
 
 - shell:
   - [git submodule update --init --recursive, Installing submodules]

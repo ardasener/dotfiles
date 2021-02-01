@@ -26,7 +26,9 @@ alias ls='ls --color=auto'
 alias ll='ls -lav --ignore=..'   # show long listing of all except ".."
 alias l='ls -lav --ignore=.?*'   # show long listing but no hidden dotfiles except "."
 
-
+alias vim="nvim"
+alias vi="nvim"
+alias view="nvim -R"
 
 # PATH
 export PATH=$PATH:~/.local/bin
