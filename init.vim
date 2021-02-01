@@ -14,8 +14,8 @@
 "{{{1 PLUGINS
 
 " Installs vim plug if it is not already
-if empty(glob('~/.local/share/nvim/site/autoload'))
-	silent !curl -fLo  ~/.local/share/nvim/site/autoload --create-dirs
+if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
+	silent !curl -fLo  ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
 				\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 	autocmd VimEnter * PlugInstall --sync | source ~/.vimrc
 endif
@@ -251,13 +251,14 @@ let g:completion_chain_complete_list = {
     \ 'vim': [
 		\    {'mode': 'cmd'},
     \    {'mode': '<c-p>'},
-    \    {'mode': '<c-n>'}
+    \    {'mode': '<c-n>'},
+		\    {'complete_items': ['path']}
     \],
     \ 'default': [
     \    {'complete_items': ['lsp', 'snippet']},
-		\    {'complete_items': ['buffer', 'tmux']},
+		\    {'complete_items': ['buffer', 'tmux', 'path']},
     \    {'mode': '<c-p>'},
-    \    {'mode': '<c-n>'}
+    \    {'mode': '<c-n>'},
     \]
 \}
 
@@ -516,6 +517,10 @@ inoremap <C-o> <C-x><C-o>
 " Completion with tab key in insert mode
 imap <tab> <Plug>(completion_smart_tab)
 imap <s-tab> <Plug>(completion_smart_s_tab)
+
+" Switch completion sources with the arrow keys
+imap <expr> <right> pumvisible() ? '<Plug>(completion_next_source)' : '<right>'
+imap <expr> <left> pumvisible() ? '<Plug>(completion_prev_source)' : '<left>'
 
 " Switch tabs/buffers with tab key in normal mode
 nnoremap <expr> <tab> MultipleTabs() ? ':tabnext<CR>' : ':bnext<CR>'  
