@@ -267,8 +267,8 @@ let g:completion_auto_change_source = 1
 
 " Disable autopopup
 let g:completion_enable_auto_popup = 0
-
 "}}}
+
 
 
 "{{{LSP
@@ -486,7 +486,7 @@ nmap <C-e> :SyntasticCheck<CR>
 nmap <C-n> :Fern . -drawer -toggle<CR>
 
 " Format the file with external program with Leader + ff (format file)
-nmap <leader>ff :Neoformat<CR>
+nmap <leader>ff :FixAll<CR>
 
 " Fuzzy search current pwd with CTRL + p (defined by plugin)
 " Fuzzy search history with CTRL + h

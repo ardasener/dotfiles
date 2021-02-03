@@ -30,6 +30,9 @@ alias vim="nvim"
 alias vi="nvim"
 alias view="nvim -R"
 
+alias update-mirrors="reflector --save /etc/pacman.d/mirrorlist -c Germany,Belgium --fastest 5 --ipv4 --verbose"
+
+
 # PATH
 export PATH=$PATH:~/.local/bin
 export PATH=$PATH:~/.yarn/bin
