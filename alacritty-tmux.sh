@@ -1,0 +1,1 @@
+WINIT_HIDPI_FACTOR=1 WINIT_X11_SCALE_FACTOR=1 alacritty --command tmux

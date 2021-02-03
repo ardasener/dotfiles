@@ -40,9 +40,6 @@ export PATH=$PATH:~/.local/bin
 export PATH=$PATH:~/.yarn/bin
 
 
-
-
-
 # Some stuff, I don't know what they do.
 [[ "$(whoami)" = "root" ]] && return
 [[ -z "$FUNCNEST" ]] && export FUNCNEST=100          # limits recursive functions, see 'man bash'

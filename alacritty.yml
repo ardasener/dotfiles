@@ -27,7 +27,7 @@ colors:
     white: "0xe1e3e4"
 
 font:
-  size: 12
+  size: 14
   normal:
     family: Dejavu Sans Mono
     style: Regular
