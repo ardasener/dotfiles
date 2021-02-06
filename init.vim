@@ -112,7 +112,21 @@ Plug 'voldikss/vim-floaterm'
 
 " Snippets
 Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
+Plug 'ardasener/vim-ultisnips-snippets'
+
+" Like snippets for html
+" html:5 for generic html template
+" Example: div>ul>li
+" <C-z>, will expand it
+" <C-z>u will update it
+Plug 'mattn/emmet-vim'
+
+" Allows searching for any word/visual selection
+" with the leader + ss
+Plug 'keith/investigate.vim'
+
+" For languages without LSP 
+Plug 'sbdchd/neoformat'
 
 "2}}}
 
@@ -201,7 +215,7 @@ let g:cpp_member_variable_highlight = 1
 let g:cpp_class_decl_highlight = 1
 let g:cpp_posix_standard = 1
 
-"Sets the comment style for the languages listed to line comments
+"mattn/emmet-vimSets the comment style for the languages listed to line comments
 "So '//' instead of '/* */'. Commentary plugin will then use '//'.
 autocmd FileType c,cpp,java,go,rust,javascript setlocal commentstring=//\ %s
 
@@ -228,8 +242,14 @@ let g:airline#extensions#whitespace#enabled = 0
 " Enable nice looking tabline
 let g:airline#extensions#tabline#enabled = 1
 
+" Disable nvim lsp until they stabilize it 
+let g:airline#extensions#nvimlsp#enabled = 0
+
 " Expand snippet with <C-j>
 let g:UltiSnipsExpandTrigger="<C-j>"
+
+" Ultisnips snippet path
+let g:UltiSnipsSnippetDirectories = ['CustomSnips']
 
 " Limit pumheight (completion menu)
 set pumheight=10
@@ -413,23 +433,6 @@ endfunction
 function! MultipleTabs() abort
 	return tabpagenr('$') > 1 
 endfunction
-
-" Silent allows running commands without the press Enter prompt
-" The built-in silent command messes up the screen in terminal, so redraw
-command! -nargs=1 Silent
-\ | execute ':silent '.<q-args>
-\ | execute ':redraw!'
-
-function! Google(str)
-	let url = 'https://google.com/search?q=' . &filetype . '+'. a:str
-	Silent exec "!firefox " . "'" . url . "'"
-endfunction
-
-function! Devdocs(str)
-	let url = 'https://devdocs.io/\\\#q=' . a:str
-	Silent exec "!firefox " . "'" . url . "'"
-endfunction
-
 "}}}
 
 
@@ -459,6 +462,9 @@ command! Cdc lcd %:p:h
 " The leader is the space key
 let mapleader = " "
 
+" Leader key for emmet is CTRL + z
+let g:user_emmet_leader_key='<C-z>'
+
 "Switch windows with CTRL + H,J,K,L or CTRL + arrow keys
 nnoremap <C-J> <C-W>j
 nnoremap <C-K> <C-W>k
@@ -486,19 +492,19 @@ nmap <C-e> :SyntasticCheck<CR>
 nmap <C-n> :Fern . -drawer -toggle<CR>
 
 " Format the file with external program with Leader + ff (format file)
-nmap <leader>ff :FixAll<CR>
+nmap <leader>ff :Neoformat<CR>
 
 " Fuzzy search current pwd with CTRL + p (defined by plugin)
 " Fuzzy search history with CTRL + h
+" Fuzzy search buffers with CTRL + b
 nnoremap <C-h> :CtrlPMRUFiles <CR>
+nnoremap <C-b> :CtrlPBuffer <CR>
 
-" Search google for the word under cursor with Leader + sg (search google)
-" Search devdocs.io for the word under cursor with Leader + sd (search devdocs)
-call toop#mapFunction('Google', '<leader>sg')
-call toop#mapFunction('Devdocs', '<leader>sd')
-
-" Select all text with CTRL + a
-map <C-a> <esc>ggVG<CR>
+" Search the documentation with <leader>sd
+" In normal mode searches for the word under the key
+" In visual mode searches for the selection
+nnoremap <leader>sd :call investigate#Investigate('n')<CR>
+vnoremap <leader>sd :call investigate#Investigate('v')<CR>
 
 " Switch between header/source with Leader + aa (alternative to a.vim?)
 nnoremap <silent> <leader>aa :call SwitchSourceHeader()<cr>
