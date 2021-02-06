@@ -95,11 +95,6 @@ Plug 'junegunn/vim-peekaboo'
 " Lsp Configurations
 Plug 'neovim/nvim-lspconfig'
 
-" Completion
-Plug 'nvim-lua/completion-nvim'
-Plug 'albertoCaroM/completion-tmux'
-Plug 'steelsojka/completion-buffers'
-
 " Echos function signatures
 Plug 'Shougo/echodoc.vim'
 
@@ -245,11 +240,11 @@ let g:airline#extensions#tabline#enabled = 1
 " Disable nvim lsp until they stabilize it 
 let g:airline#extensions#nvimlsp#enabled = 0
 
-" Expand snippet with <C-j>
-let g:UltiSnipsExpandTrigger="<C-j>"
-
 " Ultisnips snippet path
 let g:UltiSnipsSnippetDirectories = ['CustomSnips']
+
+" Expand snippet with C-j
+let g:UltiSnipsExpandTrigger="<C-j>"
 
 " Limit pumheight (completion menu)
 set pumheight=10
@@ -261,32 +256,6 @@ let g:floaterm_keymap_toggle = '<C-t>'
 let g:echodoc#enable_at_startup = 1
 let g:echodoc#type = 'virtual'
 
-" Enable completion on all buffers
-autocmd BufEnter * lua require'completion'.on_attach()
-
-" Set completion to use UltiSnips
-let g:completion_enable_snippet = 'UltiSnips'
-
-let g:completion_chain_complete_list = {
-    \ 'vim': [
-		\    {'mode': 'cmd'},
-    \    {'mode': '<c-p>'},
-    \    {'mode': '<c-n>'},
-		\    {'complete_items': ['path']}
-    \],
-    \ 'default': [
-    \    {'complete_items': ['lsp', 'snippet']},
-		\    {'complete_items': ['buffer', 'tmux', 'path']},
-    \    {'mode': '<c-p>'},
-    \    {'mode': '<c-n>'},
-    \]
-\}
-
-" Automatically switch sources
-let g:completion_auto_change_source = 1
-
-" Disable autopopup
-let g:completion_enable_auto_popup = 0
 "}}}
 
 
@@ -433,6 +402,8 @@ endfunction
 function! MultipleTabs() abort
 	return tabpagenr('$') > 1 
 endfunction
+
+
 "}}}
 
 
@@ -520,17 +491,13 @@ inoremap <C-f> <C-x><C-f>
 inoremap <C-l> <C-x><C-l>
 inoremap <C-o> <C-x><C-o>
 
-" Completion with tab key in insert mode
-imap <tab> <Plug>(completion_smart_tab)
-imap <s-tab> <Plug>(completion_smart_s_tab)
-
-" Switch completion sources with the arrow keys
-imap <expr> <right> pumvisible() ? '<Plug>(completion_next_source)' : '<right>'
-imap <expr> <left> pumvisible() ? '<Plug>(completion_prev_source)' : '<left>'
-
 " Switch tabs/buffers with tab key in normal mode
 nnoremap <expr> <tab> MultipleTabs() ? ':tabnext<CR>' : ':bnext<CR>'  
 nnoremap <expr> <s-tab> MultipleTabs() ? ':tabprevious<CR>' : ':bprevious<CR>'  
+
+" Move through pum (completion menu) with tab, shift-tab
+inoremap <expr> <tab> pumvisible() ? '<C-n>' : '<tab>'  
+inoremap <expr> <s-tab> pumvisible() ? '<C-p>' : '<s-tab>'  
 
 " Clear search highlight
 nnoremap <C-g> :noh<CR>
