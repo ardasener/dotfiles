@@ -17,7 +17,10 @@ colors:
     white: "0xe1e3e4"
 
   bright:
-    black: "0x181a1c"
+    # This is not actually black
+    # For some reason htop and mc use this
+    # For what should be white text
+    black: "0xe1e3e4"
     red: "0xfb617e"
     green: "0x9ed06c"
     yellow: "0xedc763"

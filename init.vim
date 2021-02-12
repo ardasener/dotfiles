@@ -256,6 +256,8 @@ let g:floaterm_keymap_toggle = '<C-t>'
 let g:echodoc#enable_at_startup = 1
 let g:echodoc#type = 'virtual'
 
+" Enable highlight for inline lua,python,ruby
+let g:vimsyn_embed = 'lPr'
 "}}}
 
 
@@ -379,7 +381,7 @@ hi clear pythonSpaceError
 
 " Switches between source/header for C/C++/Cuda
 " An alternative to a.vim
-function! SwitchSourceHeader()
+function! SwitchSourceHeader() abort
   if (expand ("%:e") == "cpp")
     silent! find %:t:r.h
     silent! find %:t:r.hpp
@@ -395,14 +397,24 @@ function! SwitchSourceHeader()
   elseif (expand ("%:e") == "cu")	
     silent! find %:t:r.h
     silent! find %:t:r.hpp
+	else
+		echo "No corresponding file found"
   endif
 endfunction
 
-
+" Returns true if there are multiple tabs open
 function! MultipleTabs() abort
 	return tabpagenr('$') > 1 
 endfunction
 
+" Returns true if:
+"		- Pum (completion) menu is open
+"		- or there are prior non-space characters in the row
+function! ShouldComplete() abort
+	let line = getline('.')
+	let colnr = col('.')
+	return pumvisible() || (colnr > 1 && line[colnr-2] != " ")
+endfunction
 
 "}}}
 
@@ -496,8 +508,8 @@ nnoremap <expr> <tab> MultipleTabs() ? ':tabnext<CR>' : ':bnext<CR>'
 nnoremap <expr> <s-tab> MultipleTabs() ? ':tabprevious<CR>' : ':bprevious<CR>'  
 
 " Move through pum (completion menu) with tab, shift-tab
-inoremap <expr> <tab> pumvisible() ? '<C-n>' : '<tab>'  
-inoremap <expr> <s-tab> pumvisible() ? '<C-p>' : '<s-tab>'  
+inoremap <expr> <tab> ShouldComplete() ? '<C-n>' : '<tab>'  
+inoremap <expr> <s-tab> ShouldComplete() ? '<C-p>' : '<s-tab>'  
 
 " Clear search highlight
 nnoremap <C-g> :noh<CR>
