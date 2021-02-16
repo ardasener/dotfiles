@@ -10,16 +10,19 @@
 "
 "}}}
 
+
+
 "{{{1 PLUGINS
 
 " Installs vim plug if it is not already
 if empty(glob('~/.vim/autoload/plug.vim'))
-	silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+	silent !curl -fLo  ~/.vim/autoload/plug.vim --create-dirs
 				\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 	autocmd VimEnter * PlugInstall --sync | source ~/.vimrc
 endif
 
 call plug#begin('~/.vim/plugged')
+
 
 "{{{2 CUSTOM OPERATORS
 
@@ -90,20 +93,29 @@ Plug 'mbbill/undotree'
 " "ap will paste the text in register a (vim's behaviour, not plugin's) 
 Plug 'junegunn/vim-peekaboo'
 
-" Completion with the tab key
-Plug 'ervandew/supertab'
-
-" Lsp Configurations
-Plug 'neovim/nvim-lspconfig'
-
 " Statusline
-Plug 'itchyny/lightline.vim'
+Plug 'vim-airline/vim-airline'
 
 " Snippets
-if has("python3")
-	Plug 'SirVer/ultisnips'
-	Plug 'honza/vim-snippets'
-endif
+Plug 'SirVer/ultisnips'
+Plug 'ardasener/vim-ultisnips-snippets'
+
+" Like snippets for html
+" html:5 for generic html template
+" Example: div>ul>li
+" <C-z>, will expand it
+" <C-z>u will update it
+Plug 'mattn/emmet-vim'
+
+" Allows searching for any word/visual selection
+" with the leader + ss
+Plug 'keith/investigate.vim'
+
+" For languages without LSP 
+Plug 'sbdchd/neoformat'
+
+" Syntax checking (linting)
+Plug 'vim-syntastic/syntastic'
 
 "2}}}
 
@@ -158,9 +170,6 @@ let g:ctrlp_custom_ignore = {
 set ignorecase
 set smartcase
 
-" Clipboard (Copy/Yank-Paste) Sync
-set clipboard=unnamedplus
-
 " Tab Size -> 2 Spaces
 set shiftwidth=2
 set tabstop=2
@@ -195,7 +204,7 @@ let g:cpp_member_variable_highlight = 1
 let g:cpp_class_decl_highlight = 1
 let g:cpp_posix_standard = 1
 
-"Sets the comment style for the languages listed to line comments
+"mattn/emmet-vimSets the comment style for the languages listed to line comments
 "So '//' instead of '/* */'. Commentary plugin will then use '//'.
 autocmd FileType c,cpp,java,go,rust,javascript setlocal commentstring=//\ %s
 
@@ -220,18 +229,28 @@ set completeopt=menuone,noselect
 let g:airline#extensions#whitespace#enabled = 0
 
 " Enable nice looking tabline
-" let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#enabled = 1
 
-" Expand snippet with <C-j>
+" Ultisnips snippet path
+let g:UltiSnipsSnippetDirectories = ['CustomSnips']
+
+" Expand snippet with C-j
 let g:UltiSnipsExpandTrigger="<C-j>"
-
-" Uses local completion by default (<C-p>)
-" Uses path completion when you have /,~ etc.
-" Uses omni completion (LSP) when you have .,::,-> etc.
-let g:SuperTabDefaultCompletionType="context"
 
 " Limit pumheight (completion menu)
 set pumheight=10
+
+" Syntastic only works once manually activated
+let g:syntastic_mode_map = {"mode": "passive"}
+
+" Fixes the issue when run inside tmux the CTRL + arrow keybindings fail
+if &term =~ '^screen'
+    execute "set <xUp>=\e[1;*A"
+    execute "set <xDown>=\e[1;*B"
+    execute "set <xRight>=\e[1;*C"
+    execute "set <xLeft>=\e[1;*D"
+endif
+
 
 "}}}
 
@@ -260,35 +279,22 @@ au FileType markdown call MDSetup()
 " Improves highlight performance
 set synmaxcol=100  
 
-" Color Scheme
+" Enables gui-like color support in terminal
+" The wierd looking lines are required for tmux
 if has('termguicolors')
+  let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
+  let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
 	set termguicolors
 endif
+
+" Color Scheme
 set background=dark
 colorscheme srcery
-
-" Ghetto fix for alacritty not having colors
-if &term == "alacritty"        
-  let &term = "xterm-256color"
-endif
 
 " Make line numbers have transparent background
 hi clear LineNr
 hi LineNr ctermfg=grey guifg=#4e4e4e ctermbg=bg guibg=bg
 hi CursorLineNr ctermfg=white guifg=#D0BFA1 cterm=bold gui=bold
-
-" Remove the vertical split line color
-" (will only use | characters)
-hi clear VertSplit
-hi VertSplit ctermfg=grey guifg=#4e4e4e guibg=bg ctermbg=bg
-
-" Highlight currentline in insert mode
-" autocmd InsertEnter * set cul
-" autocmd InsertLeave * set nocul
-
-" Highlight the extra characters on lines with 80+ chars
-" highlight OverLength ctermbg=red ctermfg=white guifg=#ffffff guibg=#cc6666
-" match OverLength /\%80v.\+/
 
 " Spell highlight
 hi clear SpellBad
@@ -302,13 +308,15 @@ highlight clear SignColumn
 " Annoying python space error highlight
 hi clear Error
 hi clear pythonSpaceError
+
+
 "}}}
 
 "{{{ FUNCTIONS
 
 " Switches between source/header for C/C++/Cuda
 " An alternative to a.vim
-function! SwitchSourceHeader()
+function! SwitchSourceHeader() abort
   if (expand ("%:e") == "cpp")
     silent! find %:t:r.h
     silent! find %:t:r.hpp
@@ -324,40 +332,23 @@ function! SwitchSourceHeader()
   elseif (expand ("%:e") == "cu")	
     silent! find %:t:r.h
     silent! find %:t:r.hpp
+	else
+		echo "No corresponding file found"
   endif
 endfunction
 
-" With the relevant keybinding will trigger completion
-" or insert a tab (or space) character depending on the context
-function! TabOrComplete() abort
-  " If completor is already open the `tab` cycles through suggested completions.
-  if pumvisible()
-    return "\<C-N>"
-  " If completor is not open and we are in the middle of typing a word then
-  " `tab` opens completor menu.
-  elseif col('.')>1 && strpart( getline('.'), col('.')-2, 3 ) =~ '^[[:keyword:][:ident:]]'
-    return "\<C-R>=completor#do('complete')\<CR>"
-  else
-    " If we aren't typing a word and we press `tab` simply do the normal `tab`
-    " action.
-    return "\<Tab>"
-  endif
+" Returns true if there are multiple tabs open
+function! MultipleTabs() abort
+	return tabpagenr('$') > 1 
 endfunction
 
-" Silent allows running commands without the press Enter prompt
-" The built-in silent command messes up the screen in terminal, so redraw
-command! -nargs=1 Silent
-\ | execute ':silent '.<q-args>
-\ | execute ':redraw!'
-
-function! Google(str)
-	let url = 'https://google.com/search?q=' . &filetype . '+'. a:str
-	Silent exec "!firefox " . "'" . url . "'"
-endfunction
-
-function! Devdocs(str)
-	let url = 'https://devdocs.io/\\\#q=' . a:str
-	Silent exec "!firefox " . "'" . url . "'"
+" Returns true if:
+"		- Pum (completion) menu is open
+"		- or there are prior non-space characters in the row
+function! ShouldComplete() abort
+	let line = getline('.')
+	let colnr = col('.')
+	return pumvisible() || (colnr > 1 && line[colnr-2] != " ")
 endfunction
 
 "}}}
@@ -369,11 +360,6 @@ endfunction
 " Edit/Source Config
 command! Config e ~/.vimrc
 command! SourceConfig source ~/.vimrc
-
-" Auto-formating using vim-itself
-command! -bar FixIndent :normal gg=G''<CR>
-command! FixTrailing %s/\s\+$//e
-command! FixAll FixIndent|FixTrailing
 
 " Toggle spell checking
 command! Spell setlocal spell!
@@ -388,6 +374,9 @@ command! Cdc lcd %:p:h
 
 " The leader is the space key
 let mapleader = " "
+
+" Leader key for emmet is CTRL + z
+let g:user_emmet_leader_key='<C-z>'
 
 "Switch windows with CTRL + H,J,K,L or CTRL + arrow keys
 nnoremap <C-J> <C-W>j
@@ -420,15 +409,15 @@ nmap <leader>ff :Neoformat<CR>
 
 " Fuzzy search current pwd with CTRL + p (defined by plugin)
 " Fuzzy search history with CTRL + h
+" Fuzzy search buffers with CTRL + b
 nnoremap <C-h> :CtrlPMRUFiles <CR>
+nnoremap <C-b> :CtrlPBuffer <CR>
 
-" Search google for the word under cursor with Leader + sg (search google)
-" Search devdocs.io for the word under cursor with Leader + sd (search devdocs)
-call toop#mapFunction('Google', '<leader>sg')
-call toop#mapFunction('Devdocs', '<leader>sd')
-
-" Select all text with CTRL + a
-map <C-a> <esc>ggVG<CR>
+" Search the documentation with <leader>sd
+" In normal mode searches for the word under the key
+" In visual mode searches for the selection
+nnoremap <leader>sd :call investigate#Investigate('n')<CR>
+vnoremap <leader>sd :call investigate#Investigate('v')<CR>
 
 " Switch between header/source with Leader + aa (alternative to a.vim?)
 nnoremap <silent> <leader>aa :call SwitchSourceHeader()<cr>
@@ -439,10 +428,20 @@ nnoremap <C-u> :UndotreeToggle<CR>
 " File/Path complete with CTRL + f
 " Line complete with CTRL + l
 " Omni complete with CTRL + o
+" Tag completion with CTRL + t
 " Otherwise just use tab
 inoremap <C-f> <C-x><C-f>
 inoremap <C-l> <C-x><C-l>
 inoremap <C-o> <C-x><C-o>
+inoremap <C-t> <C-x><C-]>
+
+" Switch tabs/buffers with tab key in normal mode
+nnoremap <expr> <tab> MultipleTabs() ? ':tabnext<CR>' : ':bnext<CR>'  
+nnoremap <expr> <s-tab> MultipleTabs() ? ':tabprevious<CR>' : ':bprevious<CR>'  
+
+" Move through pum (completion menu) with tab, shift-tab
+inoremap <expr> <tab> ShouldComplete() ? '<C-n>' : '<tab>'  
+inoremap <expr> <s-tab> ShouldComplete() ? '<C-p>' : '<s-tab>'  
 
 " Go back
 nnoremap gb <C-o>

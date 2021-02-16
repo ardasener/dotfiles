@@ -92,9 +92,6 @@ Plug 'mbbill/undotree'
 " "ap will paste the text in register a (vim's behaviour, not plugin's) 
 Plug 'junegunn/vim-peekaboo'
 
-" Lsp Configurations
-Plug 'neovim/nvim-lspconfig'
-
 " Echos function signatures
 Plug 'Shougo/echodoc.vim'
 

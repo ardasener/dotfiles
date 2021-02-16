@@ -3,31 +3,32 @@ env:
 
 colors:
   primary:
-    background: "0x2b2d3a"
-    foreground: "0xe1e3e4"
+    background: '#1C1B19'
+    foreground: '#D0BFA1'
+
+  cursor:
+    text:   '#D0BFA1'
+    cursor: '#D0BFA1'
 
   normal:
-    black: "0x181a1c"
-    red: "0xfb617e"
-    green: "0x9ed06c"
-    yellow: "0xedc763"
-    blue: "0x6dcae8"
-    magenta: "0xbb97ee"
-    cyan: "0xf89860"
-    white: "0xe1e3e4"
+    black:   '#1C1B19'
+    red:     '#EF2F27'
+    green:   '#519F50'
+    yellow:  '#FBB829'
+    blue:    '#2C78BF'
+    magenta: '#E02C6D'
+    cyan:    '#0AAEB3'
+    white:   '#D0BFA1'
 
   bright:
-    # This is not actually black
-    # For some reason htop and mc use this
-    # For what should be white text
-    black: "0xe1e3e4"
-    red: "0xfb617e"
-    green: "0x9ed06c"
-    yellow: "0xedc763"
-    blue: "0x6dcae8"
-    magenta: "0xbb97ee"
-    cyan: "0xf89860"
-    white: "0xe1e3e4"
+    black:   '#918175'
+    red:     '#F75341'
+    green:   '#98BC37'
+    yellow:  '#FED06E'
+    blue:    '#68A8E4'
+    magenta: '#FF5C8F'
+    cyan:    '#53FDE9'
+    white:   '#FCE8C3'
 
 font:
   size: 14

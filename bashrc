@@ -27,10 +27,6 @@ alias ls='ls --color=auto'
 alias ll='ls -lav --ignore=..'   # show long listing of all except ".."
 alias l='ls -lav --ignore=.?*'   # show long listing but no hidden dotfiles except "."
 
-alias vim="nvim"
-alias vi="nvim"
-alias view="nvim -R"
-
 alias update-mirrors="sudo reflector --save /etc/pacman.d/mirrorlist -c Germany,Belgium \
 	--fastest 7 --ipv4 --verbose --protocol https --age 8"
 
