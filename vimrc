@@ -348,11 +348,9 @@ endfunction
 function! ShouldComplete() abort
 	let line = getline('.')
 	let colnr = col('.')
-	return pumvisible() || (colnr > 1 && line[colnr-2] != " ")
+	return pumvisible() || (colnr > 1 && line[colnr-2] != " " && line[colnr-2] != "	")
 endfunction
-
 "}}}
-
 
 "{{{ COMMANDSS
 
@@ -409,9 +407,7 @@ nmap <leader>ff :Neoformat<CR>
 
 " Fuzzy search current pwd with CTRL + p (defined by plugin)
 " Fuzzy search history with CTRL + h
-" Fuzzy search buffers with CTRL + b
 nnoremap <C-h> :CtrlPMRUFiles <CR>
-nnoremap <C-b> :CtrlPBuffer <CR>
 
 " Search the documentation with <leader>sd
 " In normal mode searches for the word under the key

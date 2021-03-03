@@ -1,8 +1,9 @@
-alacritty
 tmux
-neovim-nightly-bin
+gvim
 python-pynvim
 xclip
 redshift
 htop
+ranger
+sakura
 mc
