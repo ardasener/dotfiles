@@ -28,7 +28,7 @@ alias ll='ls -lav --ignore=..'   # show long listing of all except ".."
 alias l='ls -lav --ignore=.?*'   # show long listing but no hidden dotfiles except "."
 
 alias update-mirrors="sudo reflector --save /etc/pacman.d/mirrorlist -c Germany,Belgium \
-	--fastest 7 --ipv4 --verbose --protocol https --age 8"
+	--latest 10 --sort rate --ipv4 --verbose --protocol https --download-timeout 20"
 
 
 # PATH

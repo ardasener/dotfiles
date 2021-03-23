@@ -117,6 +117,17 @@ Plug 'sbdchd/neoformat'
 " Syntax checking (linting)
 Plug 'vim-syntastic/syntastic'
 
+" Move to any word with s followed by two letters
+Plug 'justinmk/vim-sneak'
+
+" Rainbow Paranthesis
+Plug 'junegunn/rainbow_parentheses.vim'
+
+" Similar to org-mode (one day it will work here)
+" To-do lists, documentation, notes etc.
+Plug 'vimwiki/vimwiki'
+
+
 "2}}}
 
 call plug#end()
@@ -251,6 +262,13 @@ if &term =~ '^screen'
     execute "set <xLeft>=\e[1;*D"
 endif
 
+" Rainbow paran. settings
+" Toggle with <leader>rb
+let g:rainbow#max_level = 16
+let g:rainbow#pairs = [['(', ')'], ['[', ']'], ['{','}']]
+
+" Vimwiki path
+let g:vimwiki_list = [{'path':'~/Documents/vimwiki'}]
 
 "}}}
 
@@ -365,6 +383,14 @@ command! Spell setlocal spell!
 " Change pwd to current file's parent directory
 command! Cdc lcd %:p:h
 
+" This is an alternative version of silent
+" which will redraw the screen afterwards
+command! -nargs=+ Silent
+\   execute 'silent <args>' | redraw!
+
+" Create tags file for the pwd
+command! MakeTags Silent !ctags .
+
 "}}}
 
 "{{{ KEYBINDINGS
@@ -405,6 +431,9 @@ nmap <C-n> :Fern . -drawer -toggle<CR>
 " Format the file with external program with Leader + ff (format file)
 nmap <leader>ff :Neoformat<CR>
 
+" Toggle rainbow parantheses with Leader + rb (rainbow)
+nmap <leader>rb :RainbowParentheses!!<CR>
+
 " Fuzzy search current pwd with CTRL + p (defined by plugin)
 " Fuzzy search history with CTRL + h
 nnoremap <C-h> :CtrlPMRUFiles <CR>
@@ -439,8 +468,12 @@ nnoremap <expr> <s-tab> MultipleTabs() ? ':tabprevious<CR>' : ':bprevious<CR>'
 inoremap <expr> <tab> ShouldComplete() ? '<C-n>' : '<tab>'  
 inoremap <expr> <s-tab> ShouldComplete() ? '<C-p>' : '<s-tab>'  
 
-" Go back
+" Go to definition and go back
+nnoremap gd <C-]>
 nnoremap gb <C-o>
+
+" Search tags with a CTRLP menu with leader + st
+nnoremap <leader>st :CtrlPTag<CR> 
 
 " Determines the highlight under the cursor
 " Useful for finding those annoying ones
