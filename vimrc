@@ -66,6 +66,7 @@ Plug 'kana/vim-textobj-indent'
 Plug 'ctrlpvim/ctrlp.vim'
 
 " Colorscheme
+Plug 'rakr/vim-one'
 Plug 'srcery-colors/srcery-vim'
 
 " Automatically switch to project root
@@ -123,10 +124,12 @@ Plug 'justinmk/vim-sneak'
 " Rainbow Paranthesis
 Plug 'junegunn/rainbow_parentheses.vim'
 
-" Similar to org-mode (one day it will work here)
-" To-do lists, documentation, notes etc.
-Plug 'vimwiki/vimwiki'
+" Makes markdown mode usable
+Plug 'vim-pandoc/vim-pandoc'
+Plug 'vim-pandoc/vim-pandoc-syntax'
 
+" Auto-close paranthesis
+Plug 'raimondi/delimitmate'
 
 "2}}}
 
@@ -270,6 +273,9 @@ let g:rainbow#pairs = [['(', ')'], ['[', ']'], ['{','}']]
 " Vimwiki path
 let g:vimwiki_list = [{'path':'~/Documents/vimwiki'}]
 
+" Auto Close more smartly (balancing paranthesis)
+let g:delimitMate_balance_matchpairs=1
+
 "}}}
 
 
@@ -294,8 +300,6 @@ au FileType markdown call MDSetup()
 
 "{{{ HIGHLIGHTSS
 
-" Improves highlight performance
-set synmaxcol=100  
 
 " Enables gui-like color support in terminal
 " The wierd looking lines are required for tmux
@@ -307,7 +311,8 @@ endif
 
 " Color Scheme
 set background=dark
-colorscheme srcery
+colorscheme one
+let g:airline_theme='one'
 
 " Make line numbers have transparent background
 hi clear LineNr
