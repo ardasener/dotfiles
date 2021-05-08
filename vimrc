@@ -131,6 +131,9 @@ Plug 'vim-pandoc/vim-pandoc-syntax'
 " Auto-close paranthesis
 Plug 'raimondi/delimitmate'
 
+" Adds signs for marks
+Plug 'kshenoy/vim-signature'
+
 "2}}}
 
 call plug#end()
