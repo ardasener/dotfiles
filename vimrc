@@ -68,6 +68,8 @@ Plug 'ctrlpvim/ctrlp.vim'
 " Colorscheme
 Plug 'rakr/vim-one'
 Plug 'srcery-colors/srcery-vim'
+Plug 'franbach/miramare'
+Plug 'arcticicestudio/nord-vim'
 
 " Automatically switch to project root
 Plug 'airblade/vim-rooter'
@@ -314,13 +316,13 @@ endif
 
 " Color Scheme
 set background=dark
-colorscheme one
-let g:airline_theme='one'
+colorscheme nord
+let g:airline_theme='nord'
 
 " Make line numbers have transparent background
-hi clear LineNr
-hi LineNr ctermfg=grey guifg=#4e4e4e ctermbg=bg guibg=bg
-hi CursorLineNr ctermfg=white guifg=#D0BFA1 cterm=bold gui=bold
+" hi clear LineNr
+" hi LineNr ctermfg=grey guifg=grey ctermbg=NONE guibg=NONE
+" hi CursorLineNr ctermfg=white guifg=#D0BFA1 cterm=bold gui=bold
 
 " Spell highlight
 hi clear SpellBad

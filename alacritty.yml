@@ -1,46 +1,67 @@
 env:
   TERM: xterm-256color
+  WINIT_X11_SCALE_FACTOR: "1.0"
 
 colors:
   primary:
-    background: '#1C1B19'
-    foreground: '#D0BFA1'
-
+    background: '#2e3440'
+    foreground: '#d8dee9'
+    dim_foreground: '#a5abb6'
   cursor:
-    text:   '#D0BFA1'
-    cursor: '#D0BFA1'
-
+    text: '#2e3440'
+    cursor: '#d8dee9'
+  vi_mode_cursor:
+    text: '#2e3440'
+    cursor: '#d8dee9'
+  selection:
+    text: CellForeground
+    background: '#4c566a'
+  search:
+    matches:
+      foreground: CellBackground
+      background: '#88c0d0'
+    bar:
+      background: '#434c5e'
+      foreground: '#d8dee9'
   normal:
-    black:   '#1C1B19'
-    red:     '#EF2F27'
-    green:   '#519F50'
-    yellow:  '#FBB829'
-    blue:    '#2C78BF'
-    magenta: '#E02C6D'
-    cyan:    '#0AAEB3'
-    white:   '#D0BFA1'
-
+    black: '#3b4252'
+    red: '#bf616a'
+    green: '#a3be8c'
+    yellow: '#ebcb8b'
+    blue: '#81a1c1'
+    magenta: '#b48ead'
+    cyan: '#88c0d0'
+    white: '#e5e9f0'
   bright:
-    black:   '#918175'
-    red:     '#F75341'
-    green:   '#98BC37'
-    yellow:  '#FED06E'
-    blue:    '#68A8E4'
-    magenta: '#FF5C8F'
-    cyan:    '#53FDE9'
-    white:   '#FCE8C3'
+    black: '#4c566a'
+    red: '#bf616a'
+    green: '#a3be8c'
+    yellow: '#ebcb8b'
+    blue: '#81a1c1'
+    magenta: '#b48ead'
+    cyan: '#8fbcbb'
+    white: '#eceff4'
+  dim:
+    black: '#373e4d'
+    red: '#94545d'
+    green: '#809575'
+    yellow: '#b29e75'
+    blue: '#68809a'
+    magenta: '#8c738c'
+    cyan: '#6d96a5'
+    white: '#aeb3bb'
 
 font:
   size: 14
   normal:
-    family: Dejavu Sans Mono
+    family: Source Code Pro
     style: Regular
 
   bold:
-    family: Dejavu Sans Mono
+    family: Source Code Pro
 
   italic:
-    family: Dejavu Sans Mono
+    family: Source Code Pro
 
 key_bindings:
     # Control + 0 will reset font size by default
