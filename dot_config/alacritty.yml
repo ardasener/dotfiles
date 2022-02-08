@@ -1,0 +1,59 @@
+env:
+  TERM: xterm-256color
+  WINIT_X11_SCALE_FACTOR: "1.0"
+
+window:
+  padding:
+    x: 14
+    y: 14
+
+# Colors (Srcery)
+colors:
+  # Default colors
+  primary:
+    background: '#1c1b19'
+    foreground: '#fce8c3'
+
+  # Cursor colors
+  cursor:
+    text: CellBackground
+    cursor: '#fbb829'
+
+  # Normal colors
+  normal:
+    black:   '#1c1b19'
+    red:     '#ef2f27'
+    green:   '#519f50'
+    yellow:  '#fbb829'
+    blue:    '#2c78bf'
+    magenta: '#e02c6d'
+    cyan:    '#0aaeb3'
+    white:   '#baa67f'
+
+  # Bright colors
+  bright:
+    black:   '#918175'
+    red:     '#f75341'
+    green:   '#98bc37'
+    yellow:  '#fed06e'
+    blue:    '#68a8e4'
+    magenta: '#ff5c8f'
+    cyan:    '#2be4d0'
+    white:   '#fce8c3'
+
+font:
+  size: 14
+  normal:
+    family: Source Code Pro
+    style: Regular
+
+  bold:
+    family: Source Code Pro
+
+  italic:
+    family: Source Code Pro
+
+key_bindings:
+    # Control + 0 will reset font size by default
+  - { key: Key4, mods: Control, action: IncreaseFontSize }
+  - { key: Minus, mods: Control, action: DecreaseFontSize  }

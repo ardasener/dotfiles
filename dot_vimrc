@@ -1,0 +1,393 @@
+" VIM CONFIG
+" Arda Sener <github: ardasener>
+
+" __INDEX__
+" Hover over the section and press '*' to move to that section
+" 1) __SETUP__
+" 2) __PLUGINS__
+" 3) __VIMCONFIG__
+" 4) __PLUGINCONFIG__
+" 5) __THEME__
+" 6) __FUNCTIONS__
+" 7) __COMMANDS__
+" 8) __KEYBINDINGS__
+
+" __SETUP__
+
+"Installs VimPlug
+if empty(glob('~/.vim/autoload/plug.vim'))
+	silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+	\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+" __PLUGINS__
+
+call plug#begin('~/.vim/plugged')
+
+" Simple (though blocking) Syntax checking (linting)
+Plug 'vim-syntastic/syntastic'
+
+" Automatically switch to project root
+Plug 'airblade/vim-rooter'
+
+" Run external format tools
+Plug 'sbdchd/neoformat'
+
+" Adds additional text objects
+Plug 'kana/vim-textobj-user'
+Plug 'kana/vim-textobj-indent'
+Plug 'kana/vim-textobj-line'
+Plug 'gaving/vim-textobj-argument'
+Plug 'kana/vim-textobj-fold'
+Plug 'kana/vim-textobj-function'
+
+" Shows register contents when " is pressed in Normal mode (or CTRL+r in Insert mode)
+Plug 'junegunn/vim-peekaboo'
+
+" Comment stuff with gc<move>
+Plug 'tpope/vim-commentary'
+
+" Allows repeating actions of plugins with .
+Plug 'tpope/vim-repeat'
+
+" Auto-close paranthesis
+Plug 'raimondi/delimitmate'
+
+" Adds signs for marks
+Plug 'kshenoy/vim-signature'
+
+" Does a lot of stuff, like searching files,buffers,git commits etc.
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+
+" Really simple file browser
+Plug 'lambdalisue/fern.vim'
+
+" Git integration (mostly for the statusline)
+Plug 'tpope/vim-fugitive'
+
+" Set buffer options (tab/spaces etc.) from the file or neighbour files
+Plug 'tpope/vim-sleuth'
+
+" Adds a list of the open buffers to the command bar
+Plug 'bling/vim-bufferline'
+
+" Adds the missing motion, use s{char}{char} then move with "," and ";"
+Plug 'justinmk/vim-sneak'
+
+" Floating terminal window
+Plug 'voldikss/vim-floaterm'
+
+" Colorscheme
+Plug 'srcery-colors/srcery-vim'
+
+" Completion plugin 
+Plug 'lifepillar/vim-mucomplete'
+
+" Provides a helpful menu and easy binding for leader based bindings
+Plug 'liuchengxu/vim-which-key'
+
+call plug#end()
+
+" __VIMCONFIG__
+
+" Get rid of vi compatibility
+set nocompatible
+
+" Turn of annoying buzz
+set noerrorbells
+set novisualbell
+
+" Line numbers
+set number
+
+" Always on gutter
+set signcolumn=yes
+
+" Always on statusline
+set laststatus=2
+
+"When searching, fully lowercase strings will also match mixedcase strings
+set ignorecase
+set smartcase
+
+" Shell like completion for commands
+set wildmenu
+
+" Folding
+set foldmethod=syntax
+set nofoldenable
+
+" Completion Options
+set completeopt=menuone,noselect
+
+" Limit pumheight (completion menu)
+set pumheight=10
+
+" Fixes the issue when run inside tmux the CTRL + arrow keybindings fail
+if &term =~ '^screen'
+    execute "set <xUp>=\e[1;*A"
+    execute "set <xDown>=\e[1;*B"
+    execute "set <xRight>=\e[1;*C"
+    execute "set <xLeft>=\e[1;*D"
+endif
+
+" Set tags directory (see the relevant command)
+set tags=~/.cache/vim/tags
+
+" Default tab width
+set tabstop=2
+set shiftwidth=2
+
+
+" __PLUGINCONFIG__
+
+" Syntastic only works once manually activated
+let g:syntastic_mode_map = {"mode": "passive"}
+
+" Syntastic updates the location list every check
+let g:syntastic_always_populate_loc_list = 1
+
+" Root folder markers for rooter
+let g:rooter_patterns=[".git", "Makefile", "makefile", "package.json",
+			\	"pom.xml", "cargo.toml", "setup.py"]
+
+" MuComplete will try these in order for completion when tab key is pressed
+" You can manually cycle between them with the arrow keys
+let g:mucomplete#chains = {
+    \ 'default' : ['path', 'keyn', 'tags', 'uspl', 'dict'],
+    \ 'vim'     : ['path', 'cmd', 'keyn']
+    \ }
+
+
+" Use floating window for the which_key help menu
+let g:which_key_use_floating_win = 1
+
+"  __THEME__
+
+set background=dark
+colorscheme srcery
+
+" Spell highlight
+hi clear SpellBad
+hi clear SpellLocal
+hi SpellLocal cterm=underline gui=underline
+hi link SpellBad SpellLocal
+
+" Clear Gutter (bar on the left with syntax error signs)
+highlight clear SignColumn
+
+" Annoying python space error highlight
+hi clear Error
+hi clear pythonSpaceError
+
+" Every mark is set to red with transparent bg
+hi RedMarker guibg=NONE guifg=#C36176 ctermfg=red
+let g:SignatureMarkTextHL = "RedMarker"
+let g:SignatureMarkerTextHL = "RedMarker"
+hi! link SyntasticErrorSign RedMarker
+hi! link SyntasticWarningSign RedMarker
+hi! link SyntasticStyleErrorSign RedMarker
+hi! link SyntasticStyleWarningSign RedMarker
+
+
+" __STATUSLINE__
+
+let g:currentmode={
+  \ 'n'  : 'Normal',
+  \ 'no' : 'Normal·Operator Pending',
+  \ 'v'  : 'Visual',
+  \ 'V'  : 'V·Line',
+  \ '' : 'V·Block',
+  \ 's'  : 'Select',
+  \ 'S'  : 'S·Line',
+  \ '^S' : 'S·Block',
+  \ 'i'  : 'Insert',
+  \ 'R'  : 'Replace',
+  \ 'Rv' : 'V·Replace',
+  \ 'c'  : 'Command',
+  \ 'cv' : 'Vim Ex',
+  \ 'ce' : 'Ex',
+  \ 'r'  : 'Prompt',
+  \ 'rm' : 'More',
+  \ 'r?' : 'Confirm',
+  \ '!'  : 'Shell',
+  \ 't'  : 'Terminal'
+  \}
+
+set laststatus=2
+set statusline=\ %{toupper(g:currentmode[mode()])}
+set statusline+=\ %f
+set statusline+=\ %{FugitiveStatusline()}
+set statusline+=%=
+set statusline+=\ %y
+set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
+set statusline+=\[%{&fileformat}\]
+set statusline+=\ %l/%L
+set statusline+=\ 
+
+
+" __FUNCTIONS__
+
+" Switches between C/C++/Cuda source and header files
+function! SwitchSourceHeader() abort
+  if (expand ("%:e") == "cpp")
+    silent! find %:t:r.h
+    silent! find %:t:r.hpp
+  elseif (expand ("%:e") == "c")
+    silent! find %:t:r.h
+  elseif (expand ("%:e") == "hpp")
+    silent! find %:t:r.cpp
+    silent! find %:t:r.cu
+  elseif (expand ("%:e") == "h")
+    silent! find %:t:r.cpp
+    silent! find %:t:r.c
+    silent! find %:t:r.cu
+  elseif (expand ("%:e") == "cu")
+    silent! find %:t:r.h
+    silent! find %:t:r.hpp
+  else
+    echo "No corresponding file found"
+  endif
+endfunction
+
+" Returns true if there are multiple tabs open
+function! MultipleTabs() abort
+	return tabpagenr('$') > 1
+endfunction
+
+" Returns true if pumvisible
+" or non-space (and non-tab) character preceeds current location
+function! ShouldComplete() abort
+	let line = getline('.')
+	let colnr = col('.')
+	return pumvisible() || (colnr > 1 && line[colnr-2] != " " && line[colnr-2] != "	")
+endfunction
+
+
+
+" __COMMANDS__
+
+" Edit/Source Config
+command! Config e ~/.vimrc
+command! SourceConfig source ~/.vimrc
+
+" Toggle spell checking
+command! Spell setlocal spell!
+
+" Change pwd to current file's parent directory
+" You can return to project root by running :Rooter
+command! Cdc lcd %:p:h
+
+" Generate ctags
+command! GenTags call system("mkdir -p ~/.cache/vim && touch ~/.cache/vim/tags && ctags -f ~/.cache/vim/tags -R `pwd`") | echo "Tags are updated!"
+
+
+" __KEYBINDINGS__
+
+"Switch windows with CTRL + H,J,K,L or CTRL + arrow keys
+nnoremap <C-J> <C-W>j
+nnoremap <C-K> <C-W>k
+nnoremap <C-L> <C-W>l
+nnoremap <C-H> <C-W>h
+nnoremap <C-Down> <C-W>j
+nnoremap <C-Up> <C-W>k
+nnoremap <C-Right> <C-W>l
+nnoremap <C-Left> <C-W>h
+
+"Same for the terminal mode
+tnoremap <C-J> <C-W>j
+tnoremap <C-K> <C-W>k
+tnoremap <C-L> <C-W>l
+tnoremap <C-H> <C-W>h
+tnoremap <C-Down> <C-W>j
+tnoremap <C-Up> <C-W>k
+tnoremap <C-Right> <C-W>l
+tnoremap <C-Left> <C-W>h
+
+" Switch tabs/buffers with tab key in normal mode
+nnoremap <expr> <tab> MultipleTabs() ? ':tabnext<CR>' : ':bnext<CR>'
+nnoremap <expr> <s-tab> MultipleTabs() ? ':tabprevious<CR>' : ':bprevious<CR>'
+
+" Simplified bindings for some non-MuComplete sources that are occasionally
+" useful
+inoremap <C-f> <C-x><C-f>
+inoremap <C-l> <C-x><C-l>
+inoremap <C-o> <C-x><C-o>
+
+" Switch between completion sources with left-right keys
+inoremap <silent> <plug>(MUcompleteFwdKey) <right>
+imap <right> <plug>(MUcompleteCycFwd)
+inoremap <silent> <plug>(MUcompleteBwdKey) <left>
+imap <left> <plug>(MUcompleteCycBwd)
+
+" Toggle the floating terminal with CTRL + T
+let g:floaterm_keymap_toggle = '<C-t>'
+
+" Rest of the keybindings use the following system:
+" leader{char1}{char2} where leader is the space key
+" char1 is a single character representing a section
+" char2 is a single character representing an action within that section
+" a help window will popup after leader is entered with some delay
+
+" The leader is the space key
+let mapleader = " "
+
+let g:which_key_map = {}
+
+" PROCESSING (p)
+" External processors called on the buffer
+" - Lint (l)
+" - Format (f)
+let g:which_key_map['p'] = {
+      \ 'name': 'processing',
+      \ 'l': [':SyntasticCheck', 'lint'],
+      \ 'f': [':Neoformat', 'format'],
+      \ }
+
+" TAGS (t)
+" Anything related to tags
+" - Generate Tags (g)
+" - Forward ie, jump to tag (f)
+" - Backward (b)
+" - Search with FZF (s)
+let g:which_key_map['t'] = {
+      \ 'name': 'tags',
+      \ 'l': [':GenTags', 'generate'],
+      \ 'f': ['<C-]>', 'forward'],
+      \ 'b': ['<C-o>', 'backward'],
+      \ 's': [':Tags', 'search'],
+      \ }
+
+
+" ALTERNATE (a)
+" Similar functionality to a.vim provided by a function in this script
+" (see __FUNCTIONS__)
+" - Alternate ie, alternate here (a)
+" - Vertical ie, alternate in vertical split (v)
+" - Horizontal ie, alternate in horizontal split (h)
+let g:which_key_map['a'] = {
+      \ 'name': 'alternate',
+      \ 'a': [':call SwitchSourceHeader()', 'here'],
+      \ 'v': [':vsp <bar> call SwitchSourceHeader()', 'vertical split'],
+      \ 'h': [':sp <bar> call SwitchSourceHeader()', 'horizontal split'],
+      \ }
+
+" FZF (f)
+" Anything related to the FZF plugin (finding files etc.)
+" (unless they fit another section better like Tags)
+" - Find with FZF (f)
+" - History with FZF (h)
+" - Buffers with FZF (b)
+let g:which_key_map['f'] = {
+      \ 'name': 'fzf',
+      \ 'f': [':Files', 'files'],
+      \ 'h': [':History', 'history'],
+      \ 'b': [':Buffers', 'buffers'],
+      \ }
+
+
+call which_key#register('<Space>', "g:which_key_map")
+nnoremap <silent> <leader> :<c-u>WhichKey '<Space>'<CR>
+
