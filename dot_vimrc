@@ -221,6 +221,7 @@ set statusline=\ %{toupper(g:currentmode[mode()])}
 set statusline+=\ %f
 set statusline+=\ %{FugitiveStatusline()}
 set statusline+=%=
+set statusline+=\ %{SleuthIndicator()}
 set statusline+=\ %y
 set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
 set statusline+=\[%{&fileformat}\]
@@ -354,7 +355,7 @@ let g:which_key_map['p'] = {
 " - Search with FZF (s)
 let g:which_key_map['t'] = {
       \ 'name': 'tags',
-      \ 'l': [':GenTags', 'generate'],
+      \ 'g': [':GenTags', 'generate'],
       \ 'f': ['<C-]>', 'forward'],
       \ 'b': ['<C-o>', 'backward'],
       \ 's': [':Tags', 'search'],
@@ -386,7 +387,6 @@ let g:which_key_map['f'] = {
       \ 'h': [':History', 'history'],
       \ 'b': [':Buffers', 'buffers'],
       \ }
-
 
 call which_key#register('<Space>', "g:which_key_map")
 nnoremap <silent> <leader> :<c-u>WhichKey '<Space>'<CR>

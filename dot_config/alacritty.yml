@@ -42,16 +42,16 @@ colors:
     white:   '#fce8c3'
 
 font:
-  size: 14
+  size: 16
   normal:
-    family: Source Code Pro
+    family: Ubuntu Mono
     style: Regular
 
   bold:
-    family: Source Code Pro
+    family: Ubuntu Mono
 
   italic:
-    family: Source Code Pro
+    family: Ubuntu Mono
 
 key_bindings:
     # Control + 0 will reset font size by default
