@@ -1,5 +1,7 @@
 " VIM CONFIG
-" Arda Sener <github: ardasener>
+
+"Arda Sener, 2022	
+"<http://github.com/ardasener>
 
 " __INDEX__
 " Hover over the section and press '*' to move to that section
@@ -88,6 +90,12 @@ Plug 'lifepillar/vim-mucomplete'
 " Provides a helpful menu and easy binding for leader based bindings
 Plug 'liuchengxu/vim-which-key'
 
+" Snippet engine (requires python3 and vim with python3 support)
+Plug 'SirVer/ultisnips'
+
+" Custom Snippets
+Plug 'ardasener/vim-ultisnips-snippets'
+
 call plug#end()
 
 " __VIMCONFIG__
@@ -140,6 +148,8 @@ set tags=~/.cache/vim/tags
 set tabstop=2
 set shiftwidth=2
 
+" Use line comments in the listed filetypes
+au FileType c,cpp,cuda,rust,go setlocal commentstring=//\ %s
 
 " __PLUGINCONFIG__
 
@@ -163,6 +173,10 @@ let g:mucomplete#chains = {
 
 " Use floating window for the which_key help menu
 let g:which_key_use_floating_win = 1
+
+" Use my custom snippets in ultisnips
+let g:UltiSnipsSnippetDirectories=["CustomSnips"]
+
 
 "  __THEME__
 
@@ -312,10 +326,9 @@ nnoremap <expr> <tab> MultipleTabs() ? ':tabnext<CR>' : ':bnext<CR>'
 nnoremap <expr> <s-tab> MultipleTabs() ? ':tabprevious<CR>' : ':bprevious<CR>'
 
 " Simplified bindings for some non-MuComplete sources that are occasionally
-" useful
+" useful (files with CTRL+f, lines with CTRL+l)
 inoremap <C-f> <C-x><C-f>
 inoremap <C-l> <C-x><C-l>
-inoremap <C-o> <C-x><C-o>
 
 " Switch between completion sources with left-right keys
 inoremap <silent> <plug>(MUcompleteFwdKey) <right>
@@ -325,6 +338,15 @@ imap <left> <plug>(MUcompleteCycBwd)
 
 " Toggle the floating terminal with CTRL + T
 let g:floaterm_keymap_toggle = '<C-t>'
+
+" Expand and advance snippets with CTRL + J
+let g:UltiSnipsExpandTrigger='<C-p>'
+let g:UltiSnipsListSnippets='<C-tab>'
+let g:UltiSnipsJumpForwardTrigger='<C-p>'
+let g:UltiSnipsJumpBackwardTrigger='<c-o>'
+
+
+
 
 " Rest of the keybindings use the following system:
 " leader{char1}{char2} where leader is the space key

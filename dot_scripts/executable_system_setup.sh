@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Arda Sener, 2022	
+# <http://github.com/ardasener>
+
 # WIP (USE WITH CAUTION)
 
 # This script performs a basic system setup for GNU/Linux systems to my liking

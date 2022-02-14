@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Arda Sener, 2022	
+# <http://github.com/ardasener>
+
 # This script launches a lightweigth development environment
 # 
 # Requirements:
