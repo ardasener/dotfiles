@@ -82,7 +82,7 @@ Plug 'justinmk/vim-sneak'
 Plug 'voldikss/vim-floaterm'
 
 " Colorscheme
-Plug 'srcery-colors/srcery-vim'
+Plug 'sainnhe/sonokai'
 
 " Completion plugin 
 Plug 'lifepillar/vim-mucomplete'
@@ -95,6 +95,10 @@ Plug 'SirVer/ultisnips'
 
 " Custom Snippets
 Plug 'ardasener/vim-ultisnips-snippets'
+
+" Outline similar to VSCode
+Plug 'liuchengxu/vista.vim'
+
 
 call plug#end()
 
@@ -177,11 +181,21 @@ let g:which_key_use_floating_win = 1
 " Use my custom snippets in ultisnips
 let g:UltiSnipsSnippetDirectories=["CustomSnips"]
 
+" Buffer numbers are often not needed
+" So this sets bufferline to omit them
+let g:bufferline_show_bufnr = 0
+
 
 "  __THEME__
 
+if has('termguicolors')
+  set termguicolors
+endif
+
 set background=dark
-colorscheme srcery
+let g:sonokai_style = 'default'
+let g:sonokai_better_performance = 1
+colorscheme sonokai
 
 " Spell highlight
 hi clear SpellBad
@@ -247,25 +261,26 @@ set statusline+=\
 
 " Switches between C/C++/Cuda source and header files
 function! SwitchSourceHeader() abort
-  if (expand ("%:e") == "cpp")
-    silent! find %:t:r.h
-    silent! find %:t:r.hpp
-  elseif (expand ("%:e") == "c")
-    silent! find %:t:r.h
-  elseif (expand ("%:e") == "hpp")
-    silent! find %:t:r.cpp
-    silent! find %:t:r.cu
-  elseif (expand ("%:e") == "h")
-    silent! find %:t:r.cpp
-    silent! find %:t:r.c
-    silent! find %:t:r.cu
-  elseif (expand ("%:e") == "cu")
-    silent! find %:t:r.h
-    silent! find %:t:r.hpp
-  else
-    echo "No corresponding file found"
-  endif
+
+  let extensions = ["h","hpp","hxx","cuh","c","cpp","cxx","cu"]
+  let filename = expand('%:r')
+  let current_ext = expand("%:e")
+
+  for ext in extensions
+    if current_ext != ext
+      let new_filename =  filename.".".ext
+      if filereadable(new_filename)
+	execute("edit ".new_filename)
+	return 1
+      endif
+    endif
+  endfor
+
+  echo "No corresponding file was found !"
+  return 0
+
 endfunction
+
 
 " Returns true if there are multiple tabs open
 function! MultipleTabs() abort
@@ -381,6 +396,7 @@ let g:which_key_map['t'] = {
       \ 'f': ['<C-]>', 'forward'],
       \ 'b': ['<C-o>', 'backward'],
       \ 's': [':Tags', 'search'],
+      \ 'o': [':Vista!!', 'outline'],
       \ }
 
 
@@ -393,19 +409,19 @@ let g:which_key_map['t'] = {
 let g:which_key_map['a'] = {
       \ 'name': 'alternate',
       \ 'a': [':call SwitchSourceHeader()', 'here'],
-      \ 'v': [':vsp <bar> call SwitchSourceHeader()', 'vertical split'],
-      \ 'h': [':sp <bar> call SwitchSourceHeader()', 'horizontal split'],
+      \ 'v': [':vsp | call SwitchSourceHeader()', 'vsplit'],
+      \ 'h': [':sp | call SwitchSourceHeader()', 'hsplit'],
       \ }
 
-" FZF (f)
-" Anything related to the FZF plugin (finding files etc.)
-" (unless they fit another section better like Tags)
+" Files (f)
+" File and buffer related operations
 " - Find with FZF (f)
 " - History with FZF (h)
 " - Buffers with FZF (b)
 let g:which_key_map['f'] = {
-      \ 'name': 'fzf',
-      \ 'f': [':Files', 'files'],
+      \ 'name': 'files',
+      \ 'f': [':Files', 'find'],
+      \ 'm': [':Fern . -drawer -toggle', 'manager'],
       \ 'h': [':History', 'history'],
       \ 'b': [':Buffers', 'buffers'],
       \ }
