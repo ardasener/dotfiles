@@ -1,0 +1,13 @@
+links:
+  - source: wezterm/wezterm.lua
+    target: .config/wezterm/wezterm.lua
+  - source: zellij/config.kdl
+    target: .config/zellij/config.kdl
+  - source: nvim/init.lua
+    target: .config/nvim/init.lua
+  - source: tmux/tmux.conf
+    target: .tmux.conf
+  - source: zsh/zshenv
+    target: .zshenv
+  - source: zsh/zshrc
+    target: .zshrc

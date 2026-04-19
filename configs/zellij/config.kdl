@@ -1,0 +1,8 @@
+default_mode "normal"
+
+theme "catppuccin-mocha"
+pane_frames false
+mouse_mode true
+styled_underlines true
+copy_on_select true
+show_startup_tips false
