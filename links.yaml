@@ -11,3 +11,7 @@ links:
     target: .zshenv
   - source: zsh/zshrc
     target: .zshrc
+  - source: mc/ini
+    target: .config/mc/ini
+  - source: mc/skins/catppuccin.ini
+    target: .local/share/mc/skins/catppuccin.ini
