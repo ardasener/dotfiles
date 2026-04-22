@@ -7,6 +7,8 @@ path_prepend() {
 }
 
 path_prepend "$HOME/.local/bin"
+path_prepend "$HOME/.cargo/bin"
+path_prepend "$HOME/.opencode/bin"
 path_prepend "$HOME/bin"
 path_prepend "/opt/homebrew/bin"
 path_prepend "/opt/homebrew/sbin"
@@ -19,3 +21,8 @@ export PATH
 export EDITOR="nvim"
 export VISUAL="nvim"
 export PAGER="less"
+
+# Let Ctrl+Q reach tmux/shell instead of XON/XOFF flow control.
+if [[ -t 0 && -t 1 ]]; then
+  stty -ixon 2>/dev/null || true
+fi

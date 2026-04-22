@@ -15,3 +15,43 @@ links:
     target: .config/mc/ini
   - source: mc/skins/catppuccin.ini
     target: .local/share/mc/skins/catppuccin.ini
+  - source: btop/themes/catppuccin_mocha.theme
+    target: .config/btop/themes/catppuccin_mocha.theme
+  - source: btop/btop.conf
+    target: .config/btop/btop.conf
+  - source: cmus/rc
+    target: .config/cmus/rc
+  - source: cmus/catppuccin.theme
+    target: .config/cmus/catppuccin.theme
+  - source: cmus/radio-paradise.pls
+    target: .config/cmus/radio-paradise.pls
+  - source: agents/Architect.md
+    target: .config/ai-agents/Architect.md
+  - source: agents/Developer.md
+    target: .config/ai-agents/Developer.md
+  - source: agents/Tester.md
+    target: .config/ai-agents/Tester.md
+  - source: agents/Researcher.md
+    target: .config/ai-agents/Researcher.md
+  - source: agents/Reviewer.md
+    target: .config/ai-agents/Reviewer.md
+  - source: agents/Architect.md
+    target: .config/opencode/agents/Architect.md
+  - source: agents/Developer.md
+    target: .config/opencode/agents/Developer.md
+  - source: agents/Tester.md
+    target: .config/opencode/agents/Tester.md
+  - source: agents/Researcher.md
+    target: .config/opencode/agents/Researcher.md
+  - source: agents/Reviewer.md
+    target: .config/opencode/agents/Reviewer.md
+  - source: agents/AGENTS.md
+    target: .codex/AGENTS.md
+  - source: agents/AGENTS.md
+    target: .github/copilot-instructions.md
+  - source: agents/AGENTS.md
+    target: .config/opencode/AGENTS.md
+  - source: opencode/opencode.json
+    target: .config/opencode/opencode.json
+  - source: opencode/tui.json
+    target: .config/opencode/tui.json

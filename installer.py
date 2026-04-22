@@ -110,13 +110,7 @@ def ensure_link(spec: LinkSpec, install_all: bool) -> bool:
                 ))
                 choice = inquirer.select(
                     message="Action",
-                    choices=[
-                        ("Install", "install"),
-                        ("Show diff", "diff"),
-                        ("Skip", "skip"),
-                        ("Install all", "all"),
-                        ("Quit", "quit"),
-                    ],
+                    choices=["install", "diff", "skip", "all", "quit"],
                     default="install",
                 ).execute()
                 if choice == "diff":
