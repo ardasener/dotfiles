@@ -34,7 +34,6 @@ class Platform(str, Enum):
 FONT_CHOICES = {
     "FiraCode": "FiraCode.zip",
     "JetBrainsMono": "JetBrainsMono.zip",
-    "GoMono": "Go-Mono.zip",
 }
 @dataclass(frozen=True)
 class LinkSpec:
