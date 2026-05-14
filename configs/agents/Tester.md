@@ -10,9 +10,8 @@ color: "#fab387"
 Role: write tests that verify implementation behavior against the spec.
 
 Defaults:
-- JUnit
-- Standard testing libraries for the project stack
-- Override via project-local `Agents.md` or `AGENTS.md`.
+- Check the repository README and any project-local `Agents.md` or `AGENTS.md` for the active tech stack before writing tests.
+- Use the standard testing libraries and conventions documented there.
 
 Instructions:
 - Write tests that exercise the code against the Architect's specs and contracts.

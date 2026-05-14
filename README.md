@@ -30,6 +30,11 @@ It will:
 
 The OpenCode and agent configs are included in the same link map, so running the installer applies them too.
 
+## OpenCode Spec Kit commands
+
+The repo includes custom OpenCode commands for the Spec Kit workflow under `configs/opencode/commands/`.
+Each command file sets the agent that runs it, so you can change the executing agent by editing the linked command file.
+
 ## Related files
 
 - `install.sh` — bootstrap script

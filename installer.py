@@ -41,6 +41,15 @@ class LinkSpec:
     target: Path
 
 
+def link_kind(spec: LinkSpec) -> str:
+    source_parts = spec.source.parts
+    if "agents" in source_parts:
+        return "agent"
+    if "commands" in source_parts:
+        return "command"
+    return "file"
+
+
 def load_links() -> list[LinkSpec]:
     data = yaml.safe_load(LINKS_FILE.read_text()) or {}
     items = data.get("links", [])
@@ -52,6 +61,7 @@ def load_links() -> list[LinkSpec]:
         target = Path(target_raw) if target_raw.startswith("/") else Path.home() / target_raw
         links.append(LinkSpec(source=source, target=target))
 
+    console.print(f"loaded {len(links)} link(s) from {LINKS_FILE.name}")
     return links
 
 
@@ -78,17 +88,19 @@ def backup_target(target: Path) -> Path:
 
 def ensure_link(spec: LinkSpec) -> None:
     spec.target.parent.mkdir(parents=True, exist_ok=True)
+    kind = link_kind(spec)
 
     if spec.target.is_symlink() and spec.target.resolve(strict=False) == spec.source:
-        console.print(f"ok  {spec.target}")
+        console.print(f"ok  {kind}: {spec.target}")
         return
 
     if spec.target.exists() or spec.target.is_symlink():
         backup = backup_target(spec.target)
         console.print(f"backup: {backup}")
 
+    console.print(f"install {kind}: {spec.target} <- {spec.source}")
     os.symlink(spec.source, spec.target)
-    console.print(f"link {spec.target} -> {spec.source}")
+    console.print(f"linked {kind}: {spec.target} -> {spec.source}")
 
 
 def font_root_for_platform(platform: Platform) -> Path | None:
@@ -137,9 +149,11 @@ def install_fonts() -> None:
 
 
 def main() -> int:
+    console.print("starting config installation")
     install_fonts()
     for spec in load_links():
         ensure_link(spec)
+    console.print("installation complete")
     return 0
 
 

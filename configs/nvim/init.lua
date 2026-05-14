@@ -110,6 +110,8 @@ require("lazy").setup({
         },
       })
       vim.keymap.set("n", "<leader>e", ":Neotree reveal left<CR>", { desc = "File explorer" })
+      vim.keymap.set("n", "<Tab>", "<C-w>w", { desc = "Next window" })
+      vim.keymap.set("n", "<S-Tab>", "<C-w>W", { desc = "Previous window" })
       vim.keymap.set({ "n", "v" }, "<C-Left>", "<C-w>h", { desc = "Move left" })
       vim.keymap.set({ "n", "v" }, "<C-Right>", "<C-w>l", { desc = "Move right" })
       vim.keymap.set({ "n", "v" }, "<C-Up>", "<C-w>k", { desc = "Move up" })

@@ -21,7 +21,6 @@ require_cmd nvim
 require_cmd mc
 require_cmd lazygit
 require_cmd btop
-require_cmd cmus
 require_cmd opencode
 
 if ((${#missing[@]} == 0)); then
