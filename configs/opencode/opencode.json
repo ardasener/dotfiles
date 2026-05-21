@@ -2,11 +2,12 @@
   "$schema": "https://opencode.ai/config.json",
   "lsp": {},
   "agent": {
-    "build": {
-      "disable": true
-    },
-    "plan": {
-      "disable": true
-    }
+    "build": {},
+    "plan": {}
+  },
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 20000
   }
 }

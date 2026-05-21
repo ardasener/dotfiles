@@ -30,10 +30,10 @@ It will:
 
 The OpenCode and agent configs are included in the same link map, so running the installer applies them too.
 
-## OpenCode Spec Kit commands
+## OpenCode init command
 
-The repo includes custom OpenCode commands for the Spec Kit workflow under `configs/opencode/commands/`.
-Each command file sets the agent that runs it, so you can change the executing agent by editing the linked command file.
+The repo includes a custom OpenCode init command under `configs/opencode/commands/`.
+It initializes the current project with OpenSpec for Codex and OpenCode.
 
 ## Related files
 

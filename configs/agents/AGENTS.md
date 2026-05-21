@@ -1,11 +1,6 @@
 # Agentic Workflow Guidelines
 
-Use these shared role definitions when needed:
-- `Architect`: `~/.config/ai-agents/Architect.md`
-- `Developer`: `~/.config/ai-agents/Developer.md`
-- `Tester`: `~/.config/ai-agents/Tester.md`
-- `Researcher`: `~/.config/ai-agents/Researcher.md`
-- `Reviewer`: `~/.config/ai-agents/Reviewer.md`
+Use this file as the shared coding and workflow baseline for Codex, OpenCode, and Copilot.
 
 ## 1. General Programming Standards
 - Follow SOLID and DRY principles.
@@ -42,5 +37,14 @@ Use these shared role definitions when needed:
 - Ensure I/O streams, sockets, and native buffers are closed properly.
 - Prefer standard libraries over OS-specific commands unless the OS matters.
 - Avoid assuming the underlying OS unless specified.
+
+## 5. Workflow Guidance
+- Check the repository README and any project-local `Agents.md` or `AGENTS.md` before implementing.
+- Keep application logic modular and aligned with explicit boundaries.
+- Do not write tests unless explicitly asked to do so.
+- After a major change, run available compile checks and static checkers.
+- If tests exist, run the relevant test suite too.
+- For reviews, lead with concrete defects and regressions, not style-only commentary.
+- For tests, cover behavior, edge cases, regressions, and key integration paths.
 
 Defaults can be overridden by project-local `Agents.md` or `AGENTS.md` files.
