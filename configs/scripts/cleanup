@@ -1,0 +1,170 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+PROJECTS_DIR="$HOME/Projects"
+LOG_PREFIX="[cleanup]"
+
+log_skip() {
+    echo "$LOG_PREFIX skipping $1 (not found)"
+}
+
+log_clean() {
+    echo "$LOG_PREFIX cleaned: $1"
+}
+
+get_size() {
+    du -sk "$1" 2>/dev/null | cut -f1 || echo "0"
+}
+
+clean_npm() {
+    if command -v npm >/dev/null 2>&1; then
+        local targets=()
+        while IFS= read -r d; do
+            [[ -n "$d" ]] && targets+=("$d")
+        done < <(find "$PROJECTS_DIR" -maxdepth 5 -name "node_modules" -type d 2>/dev/null)
+        local total=0
+        for t in "${targets[@]}"; do
+            total=$((total + $(get_size "$t")))
+        done
+        find "$PROJECTS_DIR" -maxdepth 3 -name "node_modules" -type d -exec rm -rf {} + 2>/dev/null || true
+        find "$PROJECTS_DIR" -maxdepth 3 -name "package-lock.json" -type f -delete 2>/dev/null || true
+        npm cache clean --force >/dev/null 2>&1 || true
+        log_clean "npm artifacts ($((total))KB freed)"
+    else
+        log_skip "npm"
+    fi
+}
+
+clean_yarn() {
+    if command -v yarn >/dev/null 2>&1; then
+        local pnp_size=$(get_size "$(find "$PROJECTS_DIR" -maxdepth 3 -name ".pnp*" -type f 2>/dev/null | head -1)")
+        local yarn_size=$(get_size "$(find "$PROJECTS_DIR" -maxdepth 3 -name ".yarn" -type d 2>/dev/null | head -1)")
+        find "$PROJECTS_DIR" -maxdepth 3 -name ".pnp*" -type f -delete 2>/dev/null || true
+        find "$PROJECTS_DIR" -maxdepth 3 -name ".yarn" -type d -exec rm -rf {} + 2>/dev/null || true
+        yarn cache clean >/dev/null 2>&1 || true
+        local saved=$((pnp_size + yarn_size))
+        log_clean "yarn artifacts (${saved}KB freed)"
+    else
+        log_skip "yarn"
+    fi
+}
+
+clean_pnpm() {
+    if command -v pnpm >/dev/null 2>&1; then
+        local total=0
+        while IFS= read -r d; do
+            [[ -n "$d" ]] && total=$((total + $(get_size "$d")))
+        done < <(find "$PROJECTS_DIR" -maxdepth 5 -name "node_modules" -type d 2>/dev/null)
+        find "$PROJECTS_DIR" -maxdepth 3 -name "node_modules" -type d -exec rm -rf {} + 2>/dev/null || true
+        find "$PROJECTS_DIR" -maxdepth 3 -name "pnpm-lock.yaml" -type f -delete 2>/dev/null || true
+        pnpm store prune >/dev/null 2>&1 || true
+        log_clean "pnpm artifacts ($((total))KB freed)"
+    else
+        log_skip "pnpm"
+    fi
+}
+
+clean_bun() {
+    if command -v bun >/dev/null 2>&1; then
+        bun pm cache rm >/dev/null 2>&1 || true
+        log_clean "bun cache (unknown KB freed)"
+    else
+        log_skip "bun"
+    fi
+}
+
+clean_cargo() {
+    if command -v cargo >/dev/null 2>&1; then
+        cargo cache --autobase >/dev/null 2>&1 || cargo prune --all >/dev/null 2>&1 || true
+        log_clean "cargo cache (unknown KB freed)"
+    else
+        log_skip "cargo"
+    fi
+}
+
+clean_go() {
+    if command -v go >/dev/null 2>&1; then
+        go clean -cache >/dev/null 2>&1 || true
+        go clean -modcache >/dev/null 2>&1 || true
+        log_clean "go cache (unknown KB freed)"
+    else
+        log_skip "go"
+    fi
+}
+
+clean_brew() {
+    if command -v brew >/dev/null 2>&1; then
+        brew cleanup --prune=all >/dev/null 2>&1 || true
+        log_clean "brew cache (unknown KB freed)"
+    else
+        log_skip "brew"
+    fi
+}
+
+clean_pip() {
+    if command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || command -v python3 >/dev/null 2>&1; then
+        local total=0
+        for name in "__pycache__" ".pytest_cache" ".mypy_cache" ".ruff_cache"; do
+            while IFS= read -r d; do
+                [[ -n "$d" ]] && total=$((total + $(get_size "$d")))
+            done < <(find "$PROJECTS_DIR" -maxdepth 4 -name "$name" -type d 2>/dev/null)
+        done
+        find "$PROJECTS_DIR" -maxdepth 4 -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+        find "$PROJECTS_DIR" -maxdepth 4 -name "*.pyc" -type f -delete 2>/dev/null || true
+        find "$PROJECTS_DIR" -maxdepth 4 -name ".pytest_cache" -type d -exec rm -rf {} + 2>/dev/null || true
+        find "$PROJECTS_DIR" -maxdepth 4 -name ".mypy_cache" -type d -exec rm -rf {} + 2>/dev/null || true
+        find "$PROJECTS_DIR" -maxdepth 4 -name ".ruff_cache" -type d -exec rm -rf {} + 2>/dev/null || true
+        log_clean "pip artifacts ($((total))KB freed)"
+    else
+        log_skip "pip"
+    fi
+}
+
+clean_gradle() {
+    if command -v gradle >/dev/null 2>&1; then
+        local total=0
+        for name in "build" ".gradle"; do
+            while IFS= read -r d; do
+                [[ -n "$d" ]] && total=$((total + $(get_size "$d")))
+            done < <(find "$PROJECTS_DIR" -maxdepth 4 -name "$name" -type d 2>/dev/null)
+        done
+        find "$PROJECTS_DIR" -maxdepth 4 -name "build" -type d -exec rm -rf {} + 2>/dev/null || true
+        find "$PROJECTS_DIR" -maxdepth 4 -name ".gradle" -type d -exec rm -rf {} + 2>/dev/null || true
+        log_clean "gradle artifacts ($((total))KB freed)"
+    else
+        log_skip "gradle"
+    fi
+}
+
+clean_maven() {
+    if command -v mvn >/dev/null 2>&1; then
+        local total=0
+        while IFS= read -r d; do
+            [[ -n "$d" ]] && total=$((total + $(get_size "$d")))
+        done < <(find "$PROJECTS_DIR" -maxdepth 5 -name "target" -type d 2>/dev/null)
+        find "$PROJECTS_DIR" -maxdepth 4 -name "target" -type d -exec rm -rf {} + 2>/dev/null || true
+        log_clean "maven artifacts ($((total))KB freed)"
+    else
+        log_skip "maven"
+    fi
+}
+
+main() {
+    echo "$LOG_PREFIX starting cleanup in $PROJECTS_DIR"
+
+    clean_npm
+    clean_yarn
+    clean_pnpm
+    clean_bun
+    clean_cargo
+    clean_go
+    clean_brew
+    clean_pip
+    clean_gradle
+    clean_maven
+
+    echo "$LOG_PREFIX done"
+}
+
+main "$@"

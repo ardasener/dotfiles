@@ -33,7 +33,11 @@ links:
     target: .github/copilot-instructions.md
   - source: agents/AGENTS.md
     target: .config/opencode/AGENTS.md
+  - source: agents/godot-master
+    target: .agents/skills/godot-master
   - source: opencode/opencode.json
     target: .config/opencode/opencode.json
   - source: opencode/tui.json
     target: .config/opencode/tui.json
+  - source: scripts/cleanup
+    target: .local/bin/cleanup

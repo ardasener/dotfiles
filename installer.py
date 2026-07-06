@@ -22,7 +22,26 @@ ROOT_DIR = Path(__file__).resolve().parent
 CONFIG_DIR = ROOT_DIR / "configs"
 LINKS_FILE = ROOT_DIR / "links.yaml"
 BACKUP_DIR = ROOT_DIR / ".backup"
+SKILLS_DIR = Path.home() / ".agents" / "skills"
+OPENCODE_CONFIG = Path.home() / ".config" / "opencode" / "opencode.json"
 console = Console()
+
+REQUIRED_SKILLS = [
+    "godot-master",
+    "find-skills",
+]
+
+REQUIRED_PLUGINS = [
+    "superpowers",
+]
+
+SKILL_INSTALL_HINTS = {
+    "godot-master": "npx skills add thedivergentai/gd-agentic-skills/skills/godot-master",
+}
+
+PLUGIN_INSTALL_HINTS = {
+    "superpowers": 'Add "superpowers@git+https://github.com/obra/superpowers.git" to the plugin array in opencode.json',
+}
 
 
 class Platform(str, Enum):
@@ -111,6 +130,77 @@ def font_root_for_platform(platform: Platform) -> Path | None:
     return None
 
 
+def check_required_skills() -> None:
+    missing = []
+    for skill in REQUIRED_SKILLS:
+        skill_path = SKILLS_DIR / skill
+        if not skill_path.exists():
+            missing.append(skill)
+
+    if missing:
+        console.print(Panel.fit(
+            "[yellow]Missing recommended skills:[/yellow]\n" +
+            "\n".join(f"  - {s}" for s in missing) +
+            "\n\n[yellow]To install:[/yellow]\n" +
+            "\n".join(f"  - {SKILL_INSTALL_HINTS.get(s, 'Unknown')}" for s in missing),
+            title="[red]Skill Check[/red]",
+            style="yellow"
+        ))
+
+
+def check_required_plugins() -> None:
+    missing = []
+    if OPENCODE_CONFIG.exists():
+        import json
+        try:
+            config = json.loads(OPENCODE_CONFIG.read_text())
+            plugins = config.get("plugin", [])
+            for required in REQUIRED_PLUGINS:
+                if not any(required in str(p) for p in plugins):
+                    missing.append(required)
+        except (json.JSONDecodeError, IOError):
+            missing = list(REQUIRED_PLUGINS)
+    else:
+        missing = list(REQUIRED_PLUGINS)
+
+    if missing:
+        console.print(Panel.fit(
+            "[yellow]Missing recommended plugins:[/yellow]\n" +
+            "\n".join(f"  - {p}" for p in missing) +
+            "\n\n[yellow]To install:[/yellow]\n" +
+            "\n".join(f"  - {PLUGIN_INSTALL_HINTS.get(p, 'Unknown')}" for p in missing),
+            title="[red]Plugin Check[/red]",
+            style="yellow"
+        ))
+
+
+def sync_godot_master_skill() -> None:
+    godot_skill_target = CONFIG_DIR / "agents" / "godot-master"
+
+    console.print("[yellow]Syncing godot-master skill from external repository...[/yellow]")
+    try:
+        import subprocess
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            subprocess.run(
+                ["git", "clone", "--depth", "1",
+                 "https://github.com/thedivergentai/GD-Agentic-Skills.git",
+                 str(tmp_path / "gd-agentic-skills")],
+                check=True,
+                capture_output=True
+            )
+            source_skill = tmp_path / "gd-agentic-skills" / "skills" / "godot-master"
+            if source_skill.exists():
+                if godot_skill_target.exists():
+                    shutil.rmtree(godot_skill_target)
+                shutil.copytree(source_skill, godot_skill_target)
+                console.print("[green]godot-master skill synced successfully[/green]")
+            else:
+                console.print("[red]godot-master skill not found in repository[/red]")
+    except Exception as e:
+        console.print(f"[red]Failed to sync godot-master skill: {e}[/red]")
+
+
 def install_fonts() -> None:
     platform = detect_platform()
     font_root = font_root_for_platform(platform)
@@ -151,8 +241,11 @@ def install_fonts() -> None:
 def main() -> int:
     console.print("starting config installation")
     install_fonts()
+    sync_godot_master_skill()
     for spec in load_links():
         ensure_link(spec)
+    check_required_skills()
+    check_required_plugins()
     console.print("installation complete")
     return 0
 
