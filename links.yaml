@@ -41,3 +41,4 @@ links:
     target: .config/opencode/tui.json
   - source: scripts/cleanup
     target: .local/bin/cleanup
+

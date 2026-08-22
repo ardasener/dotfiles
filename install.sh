@@ -30,6 +30,8 @@ fi
 mkdir -p "$LOCAL_BIN_DIR"
 printf '%s\n' "linking workspace helper: $WORKSPACE_BIN"
 ln -sf "$ROOT_DIR/scripts/workspace" "$WORKSPACE_BIN"
+printf '%s\n' "linking ws helper: $LOCAL_BIN_DIR/ws"
+ln -sf "$ROOT_DIR/scripts/ws" "$LOCAL_BIN_DIR/ws"
 
 printf '%s\n' "checking dependencies"
 bash "$ROOT_DIR/check-dependencies.sh"

@@ -25,3 +25,6 @@ Thumbs.db
 # Local backups
 *.bak.*
 .backup/
+
+# Synced from external repo (see installer.py sync_godot_master_skill)
+configs/agents/godot-master/

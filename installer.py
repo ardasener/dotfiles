@@ -8,6 +8,7 @@ from enum import Enum
 from pathlib import Path
 import os
 import shutil
+import subprocess
 import tempfile
 import urllib.request
 import zipfile
@@ -38,6 +39,11 @@ REQUIRED_PLUGINS = [
 SKILL_INSTALL_HINTS = {
     "godot-master": "npx skills add thedivergentai/gd-agentic-skills/skills/godot-master",
 }
+
+# Pinned godot-master skill revision. Full SHA so it can never move.
+# 6cb0843 = GDSkills v0.0.7, last release targeting Godot 4.6.
+# Bump only when intentionally upgrading past 4.6.
+GODOT_MASTER_REF = "6cb08431f1a7b394a9647b4f12d7d49376c02f74"
 
 PLUGIN_INSTALL_HINTS = {
     "superpowers": 'Add "superpowers@git+https://github.com/obra/superpowers.git" to the plugin array in opencode.json',
@@ -179,13 +185,25 @@ def sync_godot_master_skill() -> None:
 
     console.print("[yellow]Syncing godot-master skill from external repository...[/yellow]")
     try:
-        import subprocess
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = Path(tmpdir)
             subprocess.run(
                 ["git", "clone", "--depth", "1",
                  "https://github.com/thedivergentai/GD-Agentic-Skills.git",
                  str(tmp_path / "gd-agentic-skills")],
+                check=True,
+                capture_output=True
+            )
+            # --depth 1 clone has no history; unshallow just enough to reach the pin.
+            subprocess.run(
+                ["git", "-C", str(tmp_path / "gd-agentic-skills"),
+                 "fetch", "--quiet", "--depth", "1", "origin", GODOT_MASTER_REF],
+                check=True,
+                capture_output=True
+            )
+            subprocess.run(
+                ["git", "-C", str(tmp_path / "gd-agentic-skills"),
+                 "checkout", "--quiet", GODOT_MASTER_REF],
                 check=True,
                 capture_output=True
             )
@@ -199,6 +217,20 @@ def sync_godot_master_skill() -> None:
                 console.print("[red]godot-master skill not found in repository[/red]")
     except Exception as e:
         console.print(f"[red]Failed to sync godot-master skill: {e}[/red]")
+
+
+def install_fzf() -> None:
+    if shutil.which("fzf"):
+        console.print("ok  fzf (already installed)")
+        return
+
+    platform = detect_platform()
+    if platform == Platform.darwin:
+        console.print("[yellow]Installing fzf via brew...[/yellow]")
+        subprocess.run(["brew", "install", "fzf"], check=True)
+        console.print("[green]fzf installed[/green]")
+    else:
+        console.print("[yellow]fzf not found. Install via your package manager: apt install fzf / pacman -S fzf[/yellow]")
 
 
 def install_fonts() -> None:
@@ -241,6 +273,7 @@ def install_fonts() -> None:
 def main() -> int:
     console.print("starting config installation")
     install_fonts()
+    install_fzf()
     sync_godot_master_skill()
     for spec in load_links():
         ensure_link(spec)
