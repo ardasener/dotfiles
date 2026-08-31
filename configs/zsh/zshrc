@@ -9,25 +9,4 @@ alias ll='ls -lah'
 alias la='ls -A'
 alias c='clear'
 
-op() {
-  if ! nc -z 127.0.0.1 4096 2>/dev/null; then
-    (nohup opencode serve --port 4096 >/dev/null 2>&1 &)
-    
-    local retries=10
-    while ! nc -z 127.0.0.1 4096 2>/dev/null; do
-      sleep 0.5
-      ((retries--))
-      if [ $retries -le 0 ]; then
-        echo "Error: OpenCode server failed to start within 5 seconds."
-        return 1
-      fi
-    done
-  fi
-
-  opencode attach http://localhost:4096 --dir "${1:-$PWD}"
-}
-
-op-stop() {
-  lsof -ti:4096 | xargs kill -9 2>/dev/null
-  echo "OpenCode server stopped."
-}
+alias op='opencode2'
