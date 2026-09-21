@@ -27,6 +27,7 @@
       "unity": {
         "type": "local",
         "command": ["unity", "mcp"],
+        "codemode": false,
         "environment": {
           "PATH": "{env:HOME}/.unity/bin:{env:HOME}/.local/bin:{env:PATH}"
         }
