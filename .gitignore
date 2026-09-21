@@ -28,3 +28,4 @@ Thumbs.db
 
 # Synced from external repo (see installer.py sync_godot_master_skill)
 configs/agents/godot-master/
+configs/agents/superpowers/

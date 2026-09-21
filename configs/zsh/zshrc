@@ -10,3 +10,6 @@ alias la='ls -A'
 alias c='clear'
 
 alias op='opencode2'
+
+# Unity CLI
+. ~/.unity/env

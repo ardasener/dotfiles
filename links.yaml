@@ -35,10 +35,13 @@ links:
     target: .config/opencode/AGENTS.md
   - source: agents/godot-master
     target: .agents/skills/godot-master
+  - source: agents/superpowers
+    target: .agents/skills/superpowers
+  - source: agents/superpowers
+    target: .config/opencode/skills/superpowers
   - source: opencode/opencode.json
     target: .config/opencode/opencode.json
   - source: opencode/tui.json
     target: .config/opencode/tui.json
   - source: scripts/cleanup
     target: .local/bin/cleanup
-

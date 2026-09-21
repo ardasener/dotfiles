@@ -24,16 +24,12 @@ CONFIG_DIR = ROOT_DIR / "configs"
 LINKS_FILE = ROOT_DIR / "links.yaml"
 BACKUP_DIR = ROOT_DIR / ".backup"
 SKILLS_DIR = Path.home() / ".agents" / "skills"
-OPENCODE_CONFIG = Path.home() / ".config" / "opencode" / "opencode.json"
 console = Console()
 
 REQUIRED_SKILLS = [
     "godot-master",
     "find-skills",
-]
-
-REQUIRED_PLUGINS = [
-    "superpowers",
+    "superpowers/using-superpowers",
 ]
 
 SKILL_INSTALL_HINTS = {
@@ -45,9 +41,7 @@ SKILL_INSTALL_HINTS = {
 # Bump only when intentionally upgrading past 4.6.
 GODOT_MASTER_REF = "6cb08431f1a7b394a9647b4f12d7d49376c02f74"
 
-PLUGIN_INSTALL_HINTS = {
-    "superpowers": 'Add "superpowers@git+https://github.com/obra/superpowers.git" to the plugin array in opencode.json',
-}
+SUPERPOWERS_REPO = "https://github.com/obra/superpowers.git"
 
 
 class Platform(str, Enum):
@@ -148,34 +142,8 @@ def check_required_skills() -> None:
             "[yellow]Missing recommended skills:[/yellow]\n" +
             "\n".join(f"  - {s}" for s in missing) +
             "\n\n[yellow]To install:[/yellow]\n" +
-            "\n".join(f"  - {SKILL_INSTALL_HINTS.get(s, 'Unknown')}" for s in missing),
+            "\n".join(f"  - {SKILL_INSTALL_HINTS.get(s, 'Run the installer again')}" for s in missing),
             title="[red]Skill Check[/red]",
-            style="yellow"
-        ))
-
-
-def check_required_plugins() -> None:
-    missing = []
-    if OPENCODE_CONFIG.exists():
-        import json
-        try:
-            config = json.loads(OPENCODE_CONFIG.read_text())
-            plugins = config.get("plugin", [])
-            for required in REQUIRED_PLUGINS:
-                if not any(required in str(p) for p in plugins):
-                    missing.append(required)
-        except (json.JSONDecodeError, IOError):
-            missing = list(REQUIRED_PLUGINS)
-    else:
-        missing = list(REQUIRED_PLUGINS)
-
-    if missing:
-        console.print(Panel.fit(
-            "[yellow]Missing recommended plugins:[/yellow]\n" +
-            "\n".join(f"  - {p}" for p in missing) +
-            "\n\n[yellow]To install:[/yellow]\n" +
-            "\n".join(f"  - {PLUGIN_INSTALL_HINTS.get(p, 'Unknown')}" for p in missing),
-            title="[red]Plugin Check[/red]",
             style="yellow"
         ))
 
@@ -217,6 +185,31 @@ def sync_godot_master_skill() -> None:
                 console.print("[red]godot-master skill not found in repository[/red]")
     except Exception as e:
         console.print(f"[red]Failed to sync godot-master skill: {e}[/red]")
+
+
+def sync_superpowers_skills() -> None:
+    superpowers_target = CONFIG_DIR / "agents" / "superpowers"
+
+    console.print("[yellow]Syncing Superpowers skills from external repository...[/yellow]")
+    try:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            checkout = Path(tmpdir) / "superpowers"
+            subprocess.run(
+                ["git", "clone", "--depth", "1", SUPERPOWERS_REPO, str(checkout)],
+                check=True,
+                capture_output=True,
+            )
+            source_skills = checkout / "skills"
+            if not source_skills.exists():
+                console.print("[red]Superpowers skills directory not found in repository[/red]")
+                return
+
+            if superpowers_target.exists():
+                shutil.rmtree(superpowers_target)
+            shutil.copytree(source_skills, superpowers_target)
+            console.print("[green]Superpowers skills synced successfully[/green]")
+    except Exception as e:
+        console.print(f"[red]Failed to sync Superpowers skills: {e}[/red]")
 
 
 def install_fzf() -> None:
@@ -275,10 +268,10 @@ def main() -> int:
     install_fonts()
     install_fzf()
     sync_godot_master_skill()
+    sync_superpowers_skills()
     for spec in load_links():
         ensure_link(spec)
     check_required_skills()
-    check_required_plugins()
     console.print("installation complete")
     return 0
 
