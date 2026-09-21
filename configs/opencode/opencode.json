@@ -26,7 +26,10 @@
     "servers": {
       "unity": {
         "type": "local",
-        "command": ["{env:HOME}/.unity/bin/unity", "mcp"]
+        "command": ["unity", "mcp"],
+        "environment": {
+          "PATH": "{env:HOME}/.unity/bin:{env:HOME}/.local/bin:{env:PATH}"
+        }
       }
     }
   }

@@ -12,4 +12,4 @@ alias c='clear'
 alias op='opencode2'
 
 # Unity CLI
-. ~/.unity/env
+[ -f ~/.unity/env ] && . ~/.unity/env
