@@ -24,12 +24,12 @@
   },
   "mcp": {
     "servers": {
-      "unity": {
+      "godot": {
         "type": "local",
-        "command": ["unity", "mcp"],
-        "codemode": false,
+        "command": ["npx", "@coding-solo/godot-mcp"],
         "environment": {
-          "PATH": "{env:HOME}/.unity/bin:{env:HOME}/.local/bin:{env:PATH}"
+          "GODOT_PATH": "/path/to/godot",
+          "DEBUG": "true"
         }
       }
     }
